@@ -1,8 +1,14 @@
 use crate::scanners;
 
+pub enum MenuOptionAction {
+    Action(Box<dyn FnMut()>),
+    SubMenu(Menu),
+    Exit,
+}
+
 pub struct MenuOption {
     text: String,
-    action: Box<dyn FnMut()>,
+    action: MenuOptionAction,
 }
 
 pub struct Menu {
@@ -18,10 +24,10 @@ impl Menu {
         }
     }
 
-    pub fn add_option(&mut self, text: &str, action: impl FnMut() + 'static) {
+    pub fn add_option(&mut self, text: &str, action: MenuOptionAction) {
         self.options.push(MenuOption {
             text: text.to_string(),
-            action: Box::new(action),
+            action,
         });
     }
 
@@ -38,7 +44,11 @@ impl Menu {
                 break;
             }
             if let Some(menu_option) = self.options.get_mut(selected_option - 1) {
-                (menu_option.action)();
+                match &mut menu_option.action {
+                    MenuOptionAction::Action(action) => action(),
+                    MenuOptionAction::SubMenu(sub_menu) => sub_menu.open(),
+                    MenuOptionAction::Exit => break,
+                }
             } else {
                 println!("There is no such option, please try again: ");
             }
