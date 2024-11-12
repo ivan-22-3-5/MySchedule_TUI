@@ -24,11 +24,15 @@ impl Menu {
         }
     }
 
-    pub fn add_option(&mut self, text: &str, action: MenuOptionAction) {
-        self.options.push(MenuOption {
-            text: text.to_string(),
-            action,
-        });
+    pub fn add_option(&mut self, option: MenuOption) {
+        self.options.push(option);
+    }
+
+    pub fn with_options(mut self, options: Vec<MenuOption>) -> Self {
+        options
+            .into_iter()
+            .for_each(|option| self.options.push(option));
+        self
     }
 
     pub fn open(&mut self) {
