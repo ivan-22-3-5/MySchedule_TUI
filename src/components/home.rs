@@ -1,5 +1,5 @@
 use color_eyre::Result;
-use ratatui::{prelude::*};
+use ratatui::prelude::*;
 use ratatui::widgets::Paragraph;
 use tokio::sync::mpsc::UnboundedSender;
 
