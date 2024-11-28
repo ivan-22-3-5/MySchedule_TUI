@@ -18,11 +18,11 @@ impl DaySelector {
 
 impl Component for DaySelector {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        match key.code {
-            KeyCode::Left => self.cur_day = (self.cur_day + 6) % 7,
-            KeyCode::Right => self.cur_day = (self.cur_day + 1) % 7,
-            _ => (),
-        }
+        self.cur_day = match key.code {
+            KeyCode::Left => (self.cur_day + 6) % 7,
+            KeyCode::Right => (self.cur_day + 1) % 7,
+            _ => self.cur_day,
+        };
         Ok(None)
     }
 
