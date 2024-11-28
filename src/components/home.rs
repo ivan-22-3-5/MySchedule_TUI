@@ -1,20 +1,25 @@
 use color_eyre::Result;
+use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
-use ratatui::widgets::Paragraph;
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::Component;
+use crate::components::day_selector::DaySelector;
 use crate::{action::Action, config::Config};
 
-#[derive(Default)]
 pub struct Home {
+    day_selector: DaySelector,
     command_tx: Option<UnboundedSender<Action>>,
     config: Config,
 }
 
 impl Home {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            day_selector: DaySelector::new(),
+            command_tx: None,
+            config: Config::default(),
+        }
     }
 }
 
@@ -27,6 +32,11 @@ impl Component for Home {
     fn register_config_handler(&mut self, config: Config) -> Result<()> {
         self.config = config;
         Ok(())
+    }
+
+    fn handle_key_event(&mut self, key: KeyEvent) -> Result<Option<Action>> {
+        self.day_selector.handle_key_event(key)?;
+        Ok(None)
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>> {
@@ -43,10 +53,7 @@ impl Component for Home {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
-        frame.render_widget(
-            Paragraph::new("Hello, World!").style(Style::default().fg(Color::White)),
-            area,
-        );
+        self.day_selector.draw(frame, area)?;
         Ok(())
     }
 }
