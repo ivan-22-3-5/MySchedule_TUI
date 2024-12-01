@@ -14,7 +14,7 @@ impl Schedule {
     pub fn new(schedule: models::Schedule) -> Self {
         Self {
             day_selector: DaySelector::new(),
-            days: schedule.to_array().map(|day| ConferenceList::new(day)),
+            days: schedule.into_array().map(ConferenceList::new),
         }
     }
 }

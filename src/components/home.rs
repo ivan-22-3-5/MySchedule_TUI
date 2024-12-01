@@ -4,19 +4,19 @@ use ratatui::prelude::*;
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::Component;
-use crate::components::day_selector::DaySelector;
-use crate::{action::Action, config::Config};
+use crate::components::Schedule;
+use crate::{action::Action, config::Config, models};
 
 pub struct Home {
-    day_selector: DaySelector,
+    schedule: Schedule,
     command_tx: Option<UnboundedSender<Action>>,
     config: Config,
 }
 
 impl Home {
-    pub fn new() -> Self {
+    pub fn new(schedule: models::Schedule) -> Self {
         Self {
-            day_selector: DaySelector::new(),
+            schedule: Schedule::new(schedule),
             command_tx: None,
             config: Config::default(),
         }
@@ -35,7 +35,7 @@ impl Component for Home {
     }
 
     fn handle_key_event(&mut self, key: KeyEvent) -> Result<Option<Action>> {
-        self.day_selector.handle_key_event(key)?;
+        self.schedule.handle_key_event(key)?;
         Ok(None)
     }
 
@@ -53,7 +53,7 @@ impl Component for Home {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
-        self.day_selector.draw(frame, area)?;
+        self.schedule.draw(frame, area)?;
         Ok(())
     }
 }

@@ -13,7 +13,7 @@ pub struct Schedule {
 }
 
 impl Schedule {
-    pub fn to_array(self) -> [Vec<Conference>; 7] {
+    pub fn into_array(self) -> [Vec<Conference>; 7] {
         [
             self.monday,
             self.tuesday,

@@ -34,7 +34,7 @@ impl Component for ConferenceList {
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let titles = self.conferences.iter().map(|c| c.title.clone());
-        let items = titles.map(|title| ListItem::new(title));
+        let items = titles.map(ListItem::new);
         let list = List::new(items).highlight_style(
             Style::default()
                 .fg(Color::White)

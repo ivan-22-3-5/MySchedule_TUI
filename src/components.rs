@@ -8,9 +8,17 @@ use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{action::Action, config::Config, tui::Event};
 
+mod conference_list;
 mod day_selector;
 pub mod fps;
 pub mod home;
+mod schedule;
+
+pub use conference_list::ConferenceList;
+pub use day_selector::DaySelector;
+pub use fps::FpsCounter;
+pub use home::Home;
+pub use schedule::Schedule;
 
 /// `Component` is a trait that represents a visual and interactive element of the user interface.
 ///
