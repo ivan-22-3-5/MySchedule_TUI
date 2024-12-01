@@ -7,21 +7,21 @@ use ratatui::widgets::{Block, Borders, Tabs};
 use ratatui::Frame;
 
 pub struct DaySelector {
-    cur_day: u8,
+    pub selected_day: u8,
 }
 
 impl DaySelector {
     pub fn new() -> Self {
-        Self { cur_day: 0 }
+        Self { selected_day: 0 }
     }
 }
 
 impl Component for DaySelector {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        self.cur_day = match key.code {
-            KeyCode::Left => (self.cur_day + 6) % 7,
-            KeyCode::Right => (self.cur_day + 1) % 7,
-            _ => self.cur_day,
+        self.selected_day = match key.code {
+            KeyCode::Left => (self.selected_day + 6) % 7,
+            KeyCode::Right => (self.selected_day + 1) % 7,
+            _ => self.selected_day,
         };
         Ok(None)
     }
@@ -41,7 +41,7 @@ impl Component for DaySelector {
                     .bg(Color::DarkGray)
                     .add_modifier(Modifier::BOLD),
             )
-            .select(self.cur_day as usize);
+            .select(self.selected_day as usize);
 
         frame.render_widget(tabs, area);
         Ok(())
