@@ -40,6 +40,7 @@ tracing = "0.1.40"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "serde"] }
 serde_json = "1.0.132"
+webbrowser = "1.0.3"
 
 [build-dependencies]
 anyhow = "1.0.90"

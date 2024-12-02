@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use webbrowser;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Conference {
@@ -9,4 +10,10 @@ pub struct Conference {
     pub password: Option<String>,
     pub autostart_permission: bool,
     pub week: u8,
+}
+
+impl Conference {
+    pub fn open(&self) {
+        webbrowser::open(&self.link).expect("Browser failed to open");
+    }
 }

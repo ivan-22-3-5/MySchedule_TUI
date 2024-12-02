@@ -27,6 +27,7 @@ impl Component for ConferenceList {
         match key.code {
             KeyCode::Up => self.conference_selector.prev(),
             KeyCode::Down => self.conference_selector.next(),
+            KeyCode::Enter => self.conferences[self.conference_selector.index as usize].open(),
             _ => (),
         };
         Ok(None)
