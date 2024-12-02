@@ -14,14 +14,22 @@ impl DaySelector {
     pub fn new() -> Self {
         Self { selected_day: 0 }
     }
+
+    fn prev(&mut self) {
+        self.selected_day = (self.selected_day + 6) % 7;
+    }
+
+    fn next(&mut self) {
+        self.selected_day = (self.selected_day + 1) % 7;
+    }
 }
 
 impl Component for DaySelector {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        self.selected_day = match key.code {
-            KeyCode::Left => (self.selected_day + 6) % 7,
-            KeyCode::Right => (self.selected_day + 1) % 7,
-            _ => self.selected_day,
+        match key.code {
+            KeyCode::Left => self.prev(),
+            KeyCode::Right => self.next(),
+            _ => (),
         };
         Ok(None)
     }

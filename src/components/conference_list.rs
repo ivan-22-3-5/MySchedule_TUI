@@ -19,15 +19,28 @@ impl ConferenceList {
             selected_conference: 0,
         }
     }
+
+    fn prev(&mut self) {
+        let len = self.conferences.len() as u8;
+        if len > 1 {
+            self.selected_conference = (self.selected_conference + (len - 1)) % len;
+        }
+    }
+
+    fn next(&mut self) {
+        let len = self.conferences.len() as u8;
+        if len > 1 {
+            self.selected_conference = (self.selected_conference + 1) % len;
+        }
+    }
 }
 
 impl Component for ConferenceList {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        let len = self.conferences.len() as u8;
-        self.selected_conference = match key.code {
-            KeyCode::Up => (self.selected_conference + (len - 1)) % len,
-            KeyCode::Down => (self.selected_conference + 1) % len,
-            _ => self.selected_conference,
+        match key.code {
+            KeyCode::Up => self.prev(),
+            KeyCode::Down => self.next(),
+            _ => (),
         };
         Ok(None)
     }
