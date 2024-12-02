@@ -9,7 +9,10 @@ impl Selector {
     }
     pub fn prev(&mut self) {
         if self.length > 1 {
-            self.index = (self.index + (self.length - 1)) % self.length;
+            self.index = match self.index {
+                0 => self.length - 1,
+                _ => self.index - 1,
+            };
         }
     }
 
