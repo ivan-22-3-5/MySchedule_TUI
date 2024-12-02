@@ -12,6 +12,7 @@ mod config;
 mod errors;
 mod logging;
 mod models;
+mod theme;
 mod tui;
 
 #[tokio::main]

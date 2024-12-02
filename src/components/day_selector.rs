@@ -1,8 +1,9 @@
 use super::Component;
 use crate::action::Action;
+use crate::theme::THEME;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
-use ratatui::prelude::{Color, Modifier, Style};
+use ratatui::prelude::{Color, Style};
 use ratatui::widgets::{Block, Borders, Tabs};
 use ratatui::Frame;
 
@@ -43,12 +44,7 @@ impl Component for DaySelector {
             .style(Style::default().fg(Color::White))
             .divider("")
             .padding("", "")
-            .highlight_style(
-                Style::default()
-                    .fg(Color::White)
-                    .bg(Color::DarkGray)
-                    .add_modifier(Modifier::BOLD),
-            )
+            .highlight_style(THEME.selected)
             .select(self.selected_day as usize);
 
         frame.render_widget(tabs, area);

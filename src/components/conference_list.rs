@@ -1,9 +1,9 @@
 use super::Component;
 use crate::action::Action;
 use crate::models::Conference;
+use crate::theme::THEME;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
-use ratatui::prelude::{Color, Modifier, Style};
 use ratatui::widgets::{List, ListItem, ListState};
 use ratatui::Frame;
 
@@ -48,12 +48,7 @@ impl Component for ConferenceList {
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let titles = self.conferences.iter().map(|c| c.title.clone());
         let items = titles.map(ListItem::new);
-        let list = List::new(items).highlight_style(
-            Style::default()
-                .fg(Color::White)
-                .bg(Color::DarkGray)
-                .add_modifier(Modifier::BOLD),
-        );
+        let list = List::new(items).highlight_style(THEME.selected);
         let mut state =
             ListState::default().with_selected(Option::from(self.selected_conference as usize));
         frame.render_stateful_widget(list, area, &mut state);
