@@ -22,7 +22,7 @@ impl Schedule {
 impl Component for Schedule {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         self.day_selector.handle_key_event(key)?;
-        self.days[self.day_selector.selected_day as usize].handle_key_event(key)?;
+        self.days[self.day_selector.selected_day() as usize].handle_key_event(key)?;
         Ok(None)
     }
 
@@ -30,7 +30,7 @@ impl Component for Schedule {
         let layout: [Rect; 2] =
             Layout::vertical([Constraint::Percentage(20), Constraint::Percentage(80)]).areas(area);
         self.day_selector.draw(frame, layout[0])?;
-        self.days[self.day_selector.selected_day as usize].draw(frame, layout[1])?;
+        self.days[self.day_selector.selected_day() as usize].draw(frame, layout[1])?;
         Ok(())
     }
 }

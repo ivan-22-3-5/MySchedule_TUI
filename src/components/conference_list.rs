@@ -1,5 +1,6 @@
 use super::Component;
 use crate::action::Action;
+use crate::components::Selector;
 use crate::models::Conference;
 use crate::theme::THEME;
 use crossterm::event::{KeyCode, KeyEvent};
@@ -9,28 +10,14 @@ use ratatui::Frame;
 
 pub struct ConferenceList {
     conferences: Vec<Conference>,
-    selected_conference: u8,
+    conference_selector: Selector,
 }
 
 impl ConferenceList {
     pub fn new(conferences: Vec<Conference>) -> Self {
         Self {
+            conference_selector: Selector::new(conferences.len() as u64),
             conferences,
-            selected_conference: 0,
-        }
-    }
-
-    fn prev(&mut self) {
-        let len = self.conferences.len() as u8;
-        if len > 1 {
-            self.selected_conference = (self.selected_conference + (len - 1)) % len;
-        }
-    }
-
-    fn next(&mut self) {
-        let len = self.conferences.len() as u8;
-        if len > 1 {
-            self.selected_conference = (self.selected_conference + 1) % len;
         }
     }
 }
@@ -38,8 +25,8 @@ impl ConferenceList {
 impl Component for ConferenceList {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match key.code {
-            KeyCode::Up => self.prev(),
-            KeyCode::Down => self.next(),
+            KeyCode::Up => self.conference_selector.prev(),
+            KeyCode::Down => self.conference_selector.next(),
             _ => (),
         };
         Ok(None)
@@ -49,8 +36,8 @@ impl Component for ConferenceList {
         let titles = self.conferences.iter().map(|c| c.title.clone());
         let items = titles.map(ListItem::new);
         let list = List::new(items).highlight_style(THEME.selected);
-        let mut state =
-            ListState::default().with_selected(Option::from(self.selected_conference as usize));
+        let mut state = ListState::default()
+            .with_selected(Option::from(self.conference_selector.index as usize));
         frame.render_stateful_widget(list, area, &mut state);
         Ok(())
     }
