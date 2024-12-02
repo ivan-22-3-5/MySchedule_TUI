@@ -28,7 +28,7 @@ impl Component for Schedule {
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let layout: [Rect; 2] =
-            Layout::vertical([Constraint::Percentage(20), Constraint::Percentage(80)]).areas(area);
+            Layout::vertical([Constraint::Percentage(15), Constraint::Percentage(85)]).areas(area);
         self.day_selector.draw(frame, layout[0])?;
         self.days[self.day_selector.selected_day() as usize].draw(frame, layout[1])?;
         Ok(())

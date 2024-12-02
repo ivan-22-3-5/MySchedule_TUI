@@ -29,7 +29,8 @@ pub struct App {
 #[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Mode {
     #[default]
-    Home,
+    Schedule,
+    Settings,
 }
 
 impl App {
@@ -47,7 +48,7 @@ impl App {
             should_quit: false,
             should_suspend: false,
             config: Config::new()?,
-            mode: Mode::Home,
+            mode: Mode::Schedule,
             last_tick_key_events: Vec::new(),
             action_tx,
             action_rx,
@@ -151,6 +152,8 @@ impl App {
                 Action::ClearScreen => tui.terminal.clear()?,
                 Action::Resize(w, h) => self.handle_resize(tui, w, h)?,
                 Action::Render => self.render(tui)?,
+                Action::Schedule => self.mode = Mode::Schedule,
+                Action::Settings => self.mode = Mode::Settings,
                 _ => {}
             }
             for component in self.components.iter_mut() {

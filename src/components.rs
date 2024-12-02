@@ -14,6 +14,7 @@ pub mod fps;
 pub mod home;
 mod schedule;
 mod selector;
+mod settings;
 
 pub use conference_list::ConferenceList;
 pub use day_selector::DaySelector;
@@ -21,6 +22,7 @@ pub use fps::FpsCounter;
 pub use home::Home;
 pub use schedule::Schedule;
 pub use selector::Selector;
+pub use settings::Settings;
 
 /// `Component` is a trait that represents a visual and interactive element of the user interface.
 ///
