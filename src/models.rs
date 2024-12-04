@@ -1,5 +1,6 @@
-pub mod conference;
-pub mod schedule;
+mod conference;
+mod schedule;
+mod settings;
 
 pub use conference::Conference;
 pub use schedule::Schedule;
