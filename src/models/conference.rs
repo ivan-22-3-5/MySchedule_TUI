@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use webbrowser;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Conference {
