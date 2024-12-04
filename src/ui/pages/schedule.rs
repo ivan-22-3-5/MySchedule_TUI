@@ -1,17 +1,18 @@
-use super::{Component, ConferenceList, DaySelector};
 use crate::action::Action;
 use crate::models;
+use crate::ui::components::{ConferenceList, DaySelector};
+use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::Frame;
 use std::sync::Arc;
 
-pub struct Schedule {
+pub struct SchedulePage {
     day_selector: DaySelector,
     days: [ConferenceList; 7],
 }
 
-impl Schedule {
+impl SchedulePage {
     pub fn new(schedule: Arc<models::Schedule>) -> Self {
         Self {
             day_selector: DaySelector::new(),
@@ -20,7 +21,7 @@ impl Schedule {
     }
 }
 
-impl Component for Schedule {
+impl Component for SchedulePage {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         self.day_selector.handle_key_event(key)?;
         self.days[self.day_selector.selected_day() as usize].handle_key_event(key)?;

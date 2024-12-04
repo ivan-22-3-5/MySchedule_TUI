@@ -1,8 +1,8 @@
-use super::Component;
 use crate::action::Action;
-use crate::components::Selector;
 use crate::models::Conference;
 use crate::theme::THEME;
+use crate::ui::components::Selector;
+use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
 use ratatui::widgets::{List, ListItem, ListState};

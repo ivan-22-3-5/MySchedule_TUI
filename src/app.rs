@@ -1,9 +1,9 @@
 use crate::{
     action::Action,
-    components::{Component, FpsCounter, Home},
     config::Config,
     models::{Schedule, Settings},
     tui::{Event, Tui},
+    ui::{Component, Home},
 };
 use color_eyre::Result;
 use crossterm::event::KeyEvent;
@@ -51,10 +51,10 @@ impl App {
             frame_rate,
             schedule: Arc::clone(&schedule),
             settings: Arc::clone(&settings),
-            components: vec![
-                Box::new(Home::new(Arc::clone(&schedule), Arc::clone(&settings))),
-                Box::new(FpsCounter::default()),
-            ],
+            components: vec![Box::new(Home::new(
+                Arc::clone(&schedule),
+                Arc::clone(&settings),
+            ))],
             should_quit: false,
             should_suspend: false,
             config: Config::new()?,

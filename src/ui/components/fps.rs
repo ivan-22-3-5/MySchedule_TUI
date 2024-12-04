@@ -9,7 +9,7 @@ use ratatui::{
     Frame,
 };
 
-use super::Component;
+use crate::ui::Component;
 
 use crate::action::Action;
 

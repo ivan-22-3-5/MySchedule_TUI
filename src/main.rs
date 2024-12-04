@@ -7,13 +7,13 @@ use crate::app::App;
 mod action;
 mod app;
 mod cli;
-mod components;
 mod config;
 mod errors;
 mod logging;
 mod models;
 mod theme;
 mod tui;
+mod ui;
 
 #[tokio::main]
 async fn main() -> Result<()> {

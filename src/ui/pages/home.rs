@@ -4,13 +4,15 @@ use ratatui::prelude::*;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
 
-use super::Component;
-use crate::components::{Schedule, Settings};
+use crate::ui::components::FpsCounter;
+use crate::ui::pages::{SchedulePage, SettingsPage};
+use crate::ui::Component;
 use crate::{action::Action, config::Config, models};
 
 pub struct Home {
-    schedule: Schedule,
-    settings: Settings,
+    schedule: SchedulePage,
+    settings: SettingsPage,
+    fps: FpsCounter,
     active_page: ActivePage,
     command_tx: Option<UnboundedSender<Action>>,
     config: Config,
@@ -26,8 +28,9 @@ enum ActivePage {
 impl Home {
     pub fn new(schedule: Arc<models::Schedule>, settings: Arc<models::Settings>) -> Self {
         Self {
-            schedule: Schedule::new(schedule),
-            settings: Settings::new(settings),
+            schedule: SchedulePage::new(schedule),
+            settings: SettingsPage::new(settings),
+            fps: FpsCounter::default(),
             active_page: ActivePage::default(),
             command_tx: None,
             config: Config::default(),
@@ -55,13 +58,8 @@ impl Component for Home {
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>> {
+        self.fps.update(action.clone())?;
         match action {
-            Action::Tick => {
-                // add any logic here that should run on every tick
-            }
-            Action::Render => {
-                // add any logic here that should run on every render
-            }
             Action::Settings => self.active_page = ActivePage::Settings,
             Action::Schedule => self.active_page = ActivePage::Schedule,
             _ => {}
@@ -71,8 +69,14 @@ impl Component for Home {
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
         match self.active_page {
-            ActivePage::Settings => self.settings.draw(frame, area)?,
-            ActivePage::Schedule => self.schedule.draw(frame, area)?,
+            ActivePage::Settings => {
+                self.settings.draw(frame, area)?;
+                self.fps.draw(frame, area)?;
+            }
+            ActivePage::Schedule => {
+                self.schedule.draw(frame, area)?;
+                self.fps.draw(frame, area)?;
+            }
         }
         Ok(())
     }

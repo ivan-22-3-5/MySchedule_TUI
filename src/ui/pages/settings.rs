@@ -1,19 +1,20 @@
-use super::{Component, Selector};
 use crate::action::Action;
 use crate::models;
 use crate::theme::THEME;
+use crate::ui::components::Selector;
+use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
 use ratatui::widgets::{List, ListItem, ListState};
 use ratatui::Frame;
 use std::sync::Arc;
 
-pub struct Settings {
+pub struct SettingsPage {
     selector: Selector,
     settings: Arc<models::Settings>,
 }
 
-impl Settings {
+impl SettingsPage {
     pub fn new(settings: Arc<models::Settings>) -> Self {
         Self {
             selector: Selector::new(3),
@@ -22,7 +23,7 @@ impl Settings {
     }
 }
 
-impl Component for Settings {
+impl Component for SettingsPage {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match key.code {
             KeyCode::Up => self.selector.prev(),
