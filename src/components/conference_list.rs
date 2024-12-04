@@ -7,14 +7,15 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
 use ratatui::widgets::{List, ListItem, ListState};
 use ratatui::Frame;
+use std::sync::Arc;
 
 pub struct ConferenceList {
-    conferences: Vec<Conference>,
+    conferences: Arc<Vec<Conference>>,
     conference_selector: Selector,
 }
 
 impl ConferenceList {
-    pub fn new(conferences: Vec<Conference>) -> Self {
+    pub fn new(conferences: Arc<Vec<Conference>>) -> Self {
         Self {
             conference_selector: Selector::new(conferences.len() as u64),
             conferences,

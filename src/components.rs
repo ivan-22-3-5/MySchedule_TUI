@@ -10,8 +10,8 @@ use crate::{action::Action, config::Config, tui::Event};
 
 mod conference_list;
 mod day_selector;
-pub mod fps;
-pub mod home;
+mod fps;
+mod home;
 mod schedule;
 mod selector;
 mod settings;

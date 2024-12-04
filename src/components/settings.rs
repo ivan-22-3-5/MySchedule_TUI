@@ -1,19 +1,23 @@
 use super::{Component, Selector};
 use crate::action::Action;
+use crate::models;
 use crate::theme::THEME;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
 use ratatui::widgets::{List, ListItem, ListState};
 use ratatui::Frame;
+use std::sync::Arc;
 
 pub struct Settings {
     selector: Selector,
+    settings: Arc<models::Settings>,
 }
 
 impl Settings {
-    pub fn new() -> Self {
+    pub fn new(settings: Arc<models::Settings>) -> Self {
         Self {
             selector: Selector::new(3),
+            settings,
         }
     }
 }
@@ -29,6 +33,7 @@ impl Component for Settings {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
+        let _ = self.settings; // to appease clippy
         let items = ["1", "2", "3"].map(ListItem::new);
         let list = List::new(items).highlight_style(THEME.selected);
         let mut state =

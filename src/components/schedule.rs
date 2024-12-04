@@ -4,6 +4,7 @@ use crate::models;
 use crossterm::event::KeyEvent;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::Frame;
+use std::sync::Arc;
 
 pub struct Schedule {
     day_selector: DaySelector,
@@ -11,10 +12,10 @@ pub struct Schedule {
 }
 
 impl Schedule {
-    pub fn new(schedule: models::Schedule) -> Self {
+    pub fn new(schedule: Arc<models::Schedule>) -> Self {
         Self {
             day_selector: DaySelector::new(),
-            days: schedule.into_array().map(ConferenceList::new),
+            days: schedule.clone_into_array().map(ConferenceList::new),
         }
     }
 }

@@ -1,19 +1,21 @@
-use color_eyre::Result;
-use crossterm::event::KeyEvent;
-use ratatui::prelude::Rect;
-use serde::{Deserialize, Serialize};
-use tokio::sync::mpsc;
-use tracing::{debug, info};
-
 use crate::{
     action::Action,
     components::{Component, FpsCounter, Home},
     config::Config,
-    models,
+    models::{Schedule, Settings},
     tui::{Event, Tui},
 };
+use color_eyre::Result;
+use crossterm::event::KeyEvent;
+use ratatui::prelude::Rect;
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tokio::sync::mpsc;
+use tracing::{debug, info};
 
 pub struct App {
+    schedule: Arc<Schedule>,
+    settings: Arc<Settings>,
     config: Config,
     tick_rate: f64,
     frame_rate: f64,
@@ -36,13 +38,21 @@ pub enum Mode {
 impl App {
     pub fn new(tick_rate: f64, frame_rate: f64) -> Result<Self> {
         let (action_tx, action_rx) = mpsc::unbounded_channel();
-        let schedule: models::Schedule =
-            serde_json::from_reader(std::fs::File::open("files/schedule.json")?)?;
+        let schedule: Arc<Schedule> = Arc::new(match std::fs::File::open("files/schedule.json") {
+            Ok(file) => serde_json::from_reader(file)?,
+            Err(_) => Schedule::new(),
+        });
+        let settings: Arc<Settings> = Arc::new(match std::fs::File::open("files/settings.json") {
+            Ok(file) => serde_json::from_reader(file)?,
+            Err(_) => Settings::default(),
+        });
         Ok(Self {
             tick_rate,
             frame_rate,
+            schedule: Arc::clone(&schedule),
+            settings: Arc::clone(&settings),
             components: vec![
-                Box::new(Home::new(schedule)),
+                Box::new(Home::new(Arc::clone(&schedule), Arc::clone(&settings))),
                 Box::new(FpsCounter::default()),
             ],
             should_quit: false,
@@ -56,6 +66,8 @@ impl App {
     }
 
     pub async fn run(&mut self) -> Result<()> {
+        let _ = self.schedule; // to appease clippy
+        let _ = self.settings; // same reason
         let mut tui = Tui::new()?
             // .mouse(true) // uncomment this line to enable mouse support
             .tick_rate(self.tick_rate)

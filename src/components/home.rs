@@ -1,6 +1,7 @@
 use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
+use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::Component;
@@ -23,10 +24,10 @@ enum ActivePage {
 }
 
 impl Home {
-    pub fn new(schedule: models::Schedule) -> Self {
+    pub fn new(schedule: Arc<models::Schedule>, settings: Arc<models::Settings>) -> Self {
         Self {
             schedule: Schedule::new(schedule),
-            settings: Settings::new(),
+            settings: Settings::new(settings),
             active_page: ActivePage::default(),
             command_tx: None,
             config: Config::default(),
