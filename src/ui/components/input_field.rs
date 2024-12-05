@@ -12,17 +12,23 @@ pub struct InputField {
     title: String,
     text: String,
     cursor: usize,
+    max_length: usize,
     ticks_with_cursor: u8,
     showing_cursor_period: u8,
 }
 
 impl InputField {
     #[allow(dead_code)]
-    pub fn new(title: String, initial_text: Option<String>) -> Self {
-        let initial_text = initial_text.unwrap_or_default();
+    pub fn new(title: String, max_length: usize, initial_text: Option<String>) -> Self {
+        let initial_text: String = initial_text
+            .unwrap_or_default()
+            .chars()
+            .take(max_length)
+            .collect();
         let initial_cursor = initial_text.len();
         Self {
             title,
+            max_length,
             text: format!("{} ", initial_text),
             cursor: initial_cursor,
             ticks_with_cursor: 0,
@@ -31,7 +37,7 @@ impl InputField {
     }
 
     fn get_styled_text(&self) -> Line {
-        let style_under_cursor = if self.ticks_with_cursor <= self.showing_cursor_period {
+        let style_under_cursor = if self.ticks_with_cursor < self.showing_cursor_period {
             THEME.selected
         } else {
             Style::default()
@@ -59,9 +65,11 @@ impl InputField {
     }
 
     fn type_char(&mut self, c: char) {
-        self.text.insert(self.cursor, c);
-        self.cursor = self.cursor.saturating_add(1);
-        self.ticks_with_cursor = 0;
+        if self.text.len() <= self.max_length {
+            self.text.insert(self.cursor, c);
+            self.cursor = self.cursor.saturating_add(1);
+            self.ticks_with_cursor = 0;
+        }
     }
 
     fn backspace(&mut self) {
