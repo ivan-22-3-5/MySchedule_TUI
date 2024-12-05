@@ -8,14 +8,14 @@ use ratatui::Frame;
 use std::sync::Arc;
 
 pub struct SchedulePage {
-    day_selector: DaySelector,
+    selector: DaySelector,
     days: [ConferenceList; 7],
 }
 
 impl SchedulePage {
     pub fn new(schedule: Arc<models::Schedule>) -> Self {
         Self {
-            day_selector: DaySelector::new(),
+            selector: DaySelector::new(),
             days: schedule.clone_into_array().map(ConferenceList::new),
         }
     }
@@ -23,16 +23,29 @@ impl SchedulePage {
 
 impl Component for SchedulePage {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        self.day_selector.handle_key_event(key)?;
-        self.days[self.day_selector.selected_day() as usize].handle_key_event(key)?;
+        self.selector.handle_key_event(key)?;
+
+        self.days
+            .get_mut(self.selector.selected_day() as usize)
+            .unwrap()
+            .handle_key_event(key)?;
+        Ok(None)
+    }
+
+    fn update(&mut self, action: Action) -> color_eyre::Result<Option<Action>> {
+        self.selector.update(action.clone())?;
+        self.days
+            .get_mut(self.selector.selected_day() as usize)
+            .unwrap()
+            .update(action)?;
         Ok(None)
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let layout: [Rect; 2] =
             Layout::vertical([Constraint::Percentage(15), Constraint::Percentage(85)]).areas(area);
-        self.day_selector.draw(frame, layout[0])?;
-        self.days[self.day_selector.selected_day() as usize].draw(frame, layout[1])?;
+        self.selector.draw(frame, layout[0])?;
+        self.days[self.selector.selected_day() as usize].draw(frame, layout[1])?;
         Ok(())
     }
 }

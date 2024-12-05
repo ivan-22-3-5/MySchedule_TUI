@@ -11,13 +11,13 @@ use std::sync::Arc;
 
 pub struct ConferenceList {
     conferences: Arc<Vec<Conference>>,
-    conference_selector: Selector,
+    selector: Selector,
 }
 
 impl ConferenceList {
     pub fn new(conferences: Arc<Vec<Conference>>) -> Self {
         Self {
-            conference_selector: Selector::new(conferences.len() as u64),
+            selector: Selector::new(conferences.len() as u64),
             conferences,
         }
     }
@@ -26,9 +26,13 @@ impl ConferenceList {
 impl Component for ConferenceList {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match key.code {
-            KeyCode::Up => self.conference_selector.prev(),
-            KeyCode::Down => self.conference_selector.next(),
-            KeyCode::Enter => self.conferences[self.conference_selector.index as usize].open(),
+            KeyCode::Up => self.selector.prev(),
+            KeyCode::Down => self.selector.next(),
+            KeyCode::Enter => {
+                if let Some(c) = self.conferences.get(self.selector.index as usize) {
+                    c.open();
+                }
+            }
             _ => (),
         };
         Ok(None)
@@ -38,8 +42,8 @@ impl Component for ConferenceList {
         let titles = self.conferences.iter().map(|c| c.title.clone());
         let items = titles.map(ListItem::new);
         let list = List::new(items).highlight_style(THEME.selected);
-        let mut state = ListState::default()
-            .with_selected(Option::from(self.conference_selector.index as usize));
+        let mut state =
+            ListState::default().with_selected(Option::from(self.selector.index as usize));
         frame.render_stateful_widget(list, area, &mut state);
         Ok(())
     }

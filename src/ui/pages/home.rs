@@ -59,6 +59,8 @@ impl Component for Home {
 
     fn update(&mut self, action: Action) -> Result<Option<Action>> {
         self.fps.update(action.clone())?;
+        self.schedule.update(action.clone())?;
+        self.settings.update(action.clone())?;
         match action {
             Action::Settings => self.active_page = ActivePage::Settings,
             Action::Schedule => self.active_page = ActivePage::Schedule,
