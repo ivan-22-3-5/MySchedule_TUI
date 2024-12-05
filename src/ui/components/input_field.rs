@@ -43,34 +43,42 @@ impl InputField {
             Span::raw(&self.text[self.cursor + 1..]),
         ])
     }
+
+    fn try_move_cursor_left(&mut self) {
+        if self.cursor > 0 {
+            self.cursor = self.cursor.saturating_sub(1);
+            self.ticks_with_cursor = 0;
+        }
+    }
+
+    fn try_move_cursor_right(&mut self) {
+        if self.cursor < self.text.len() - 1 {
+            self.cursor = self.cursor.saturating_add(1);
+            self.ticks_with_cursor = 0;
+        }
+    }
+
+    fn type_char(&mut self, c: char) {
+        self.text.insert(self.cursor, c);
+        self.cursor = self.cursor.saturating_add(1);
+        self.ticks_with_cursor = 0;
+    }
+
+    fn backspace(&mut self) {
+        if self.cursor > 0 {
+            self.text.remove(self.cursor - 1);
+            self.cursor = self.cursor.saturating_sub(1);
+        }
+    }
 }
 
 impl Component for InputField {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match key.code {
-            KeyCode::Right => {
-                if self.cursor < self.text.len() - 1 {
-                    self.cursor = self.cursor.saturating_add(1);
-                    self.ticks_with_cursor = 0;
-                }
-            }
-            KeyCode::Left => {
-                if self.cursor > 0 {
-                    self.cursor = self.cursor.saturating_sub(1);
-                    self.ticks_with_cursor = 0;
-                }
-            }
-            KeyCode::Char(c) => {
-                self.text.insert(self.cursor, c);
-                self.cursor = self.cursor.saturating_add(1);
-                self.ticks_with_cursor = 0;
-            }
-            KeyCode::Backspace => {
-                if self.cursor > 0 {
-                    self.text.remove(self.cursor - 1);
-                    self.cursor = self.cursor.saturating_sub(1);
-                }
-            }
+            KeyCode::Right => self.try_move_cursor_right(),
+            KeyCode::Left => self.try_move_cursor_left(),
+            KeyCode::Char(c) => self.type_char(c),
+            KeyCode::Backspace => self.backspace(),
             _ => (),
         };
         Ok(None)
