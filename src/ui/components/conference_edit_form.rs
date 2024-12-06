@@ -37,17 +37,22 @@ impl ConferenceEditForm {
         }
     }
 
-    fn handle_transition(&mut self, key: KeyEvent) {
+    fn handle_field_selection(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Up => self.selector.move_up(),
             KeyCode::Down => self.selector.move_down(),
             KeyCode::Left => self.selector.move_left(),
             KeyCode::Right => self.selector.move_right(),
-
-            KeyCode::Enter => {
-                self.active_field = Some(self.selected_field());
-            }
             _ => {}
+        }
+    }
+
+    fn propagate_key(&mut self, key: KeyEvent) -> Result<Option<Action>> {
+        match self.active_field {
+            Some(Field::Title) => self.title.handle_key_event(key),
+            Some(Field::Link) => self.link.handle_key_event(key),
+            Some(Field::StartTime) => self.start_time.handle_key_event(key),
+            None => Ok(None),
         }
     }
 
@@ -76,17 +81,20 @@ impl ConferenceEditForm {
 impl Component for ConferenceEditForm {
     fn handle_key_event(&mut self, key: KeyEvent) -> Result<Option<Action>> {
         match &self.active_field {
-            None => self.handle_transition(key),
-            Some(field) => match key.code {
+            None => match key.code {
+                KeyCode::Enter => {
+                    self.active_field = Some(self.selected_field());
+                }
+                _ => {
+                    self.handle_field_selection(key);
+                }
+            },
+            Some(_) => match key.code {
                 KeyCode::Esc => {
                     self.active_field = None;
                 }
                 _ => {
-                    match field {
-                        Field::Title => self.title.handle_key_event(key)?,
-                        Field::Link => self.link.handle_key_event(key)?,
-                        Field::StartTime => self.start_time.handle_key_event(key)?,
-                    };
+                    self.propagate_key(key)?;
                 }
             },
         };
