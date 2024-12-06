@@ -2,6 +2,9 @@ use ratatui::style::{Color, Modifier, Style};
 
 pub struct Theme {
     pub selected: Style,
+    pub selected_field: Style,
+    pub active_field: Style,
+    pub input_field: Style,
 }
 
 pub const THEME: Theme = Theme {
@@ -9,4 +12,7 @@ pub const THEME: Theme = Theme {
         .fg(Color::White)
         .bg(Color::DarkGray)
         .add_modifier(Modifier::BOLD),
+    input_field: Style::new().fg(Color::White),
+    selected_field: Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
+    active_field: Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
 };
