@@ -10,26 +10,28 @@ use ratatui::Frame;
 
 pub struct InputField {
     title: String,
-    text: String,
+    text: Vec<char>,
     cursor: usize,
     max_length: usize,
     ticks_with_cursor: u8,
     showing_cursor_period: u8,
+    border_style: Style,
 }
-
+#[allow(dead_code)]
 impl InputField {
-    #[allow(dead_code)]
     pub fn new(title: String, max_length: usize, initial_text: Option<String>) -> Self {
-        let initial_text: String = initial_text
+        let mut initial_text: Vec<char> = initial_text
             .unwrap_or_default()
             .chars()
             .take(max_length)
             .collect();
         let initial_cursor = initial_text.len();
+        initial_text.push(' ');
         Self {
             title,
             max_length,
-            text: format!("{} ", initial_text),
+            border_style: Style::default(),
+            text: initial_text,
             cursor: initial_cursor,
             ticks_with_cursor: 0,
             showing_cursor_period: 3,
@@ -44,9 +46,12 @@ impl InputField {
         };
 
         Line::from(vec![
-            Span::raw(&self.text[..self.cursor]),
-            Span::styled(&self.text[self.cursor..self.cursor + 1], style_under_cursor),
-            Span::raw(&self.text[self.cursor + 1..]),
+            Span::raw(String::from_iter(&self.text[..self.cursor])),
+            Span::styled(
+                String::from_iter(&self.text[self.cursor..self.cursor + 1]),
+                style_under_cursor,
+            ),
+            Span::raw(String::from_iter(&self.text[self.cursor + 1..])),
         ])
     }
 
@@ -78,6 +83,10 @@ impl InputField {
             self.cursor = self.cursor.saturating_sub(1);
         }
     }
+
+    pub fn border_style(&mut self, style: Style) {
+        self.border_style = style;
+    }
 }
 
 impl Component for InputField {
@@ -107,6 +116,7 @@ impl Component for InputField {
 
         let block = Block::default()
             .borders(Borders::ALL)
+            .border_style(self.border_style)
             .title(self.title.clone());
         frame.render_widget(text, block.inner(area));
         frame.render_widget(block, area);
