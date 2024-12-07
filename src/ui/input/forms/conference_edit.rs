@@ -1,7 +1,8 @@
 use crate::action::Action;
 use crate::models::Conference;
 use crate::theme::THEME;
-use crate::ui::components::{Form, InputField};
+use crate::ui::input::fields::{InputField, StrInputField, TimeInputField};
+use crate::ui::input::forms::Form;
 use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
@@ -12,12 +13,20 @@ pub struct ConferenceEditForm(Form);
 #[allow(dead_code)]
 impl ConferenceEditForm {
     pub fn new(conference: Conference) -> Self {
-        let field_layout = vec![
+        let field_layout: Vec<Vec<Box<dyn InputField>>> = vec![
             vec![
-                InputField::new("Title".into(), 50, Some(conference.title)),
-                InputField::new("Start Time".into(), 5, Some(conference.start_time)),
+                Box::new(StrInputField::new(
+                    "Title".into(),
+                    50,
+                    Some(conference.title),
+                )),
+                Box::new(TimeInputField::new("Start Time".into())),
             ],
-            vec![InputField::new("Link".into(), 50, Some(conference.link))],
+            vec![Box::new(StrInputField::new(
+                "Link".into(),
+                50,
+                Some(conference.link),
+            ))],
         ];
         Self(
             Form::new(field_layout)

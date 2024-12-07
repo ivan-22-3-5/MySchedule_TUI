@@ -9,6 +9,7 @@ use tokio::sync::mpsc::UnboundedSender;
 use crate::{action::Action, config::Config, tui::Event};
 
 mod components;
+mod input;
 mod pages;
 
 pub use pages::home::Home;

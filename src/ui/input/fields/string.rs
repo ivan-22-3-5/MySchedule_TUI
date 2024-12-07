@@ -1,5 +1,6 @@
 use crate::action::Action;
 use crate::theme::THEME;
+use crate::ui::input::fields::InputField;
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
@@ -8,7 +9,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 
-pub struct InputField {
+pub struct StrInputField {
     title: String,
     text: Vec<char>,
     cursor: usize,
@@ -17,8 +18,19 @@ pub struct InputField {
     showing_cursor_period: u8,
     border_style: Style,
 }
+
+impl InputField for StrInputField {
+    fn get_value(&self) -> String {
+        self.text.iter().take(self.text.len() - 1).collect()
+    }
+
+    fn border_style(&mut self, style: Style) {
+        self.border_style = style;
+    }
+}
+
 #[allow(dead_code)]
-impl InputField {
+impl StrInputField {
     pub fn new(title: String, max_length: usize, initial_text: Option<String>) -> Self {
         let mut initial_text: Vec<char> = initial_text
             .unwrap_or_default()
@@ -83,13 +95,9 @@ impl InputField {
             self.cursor = self.cursor.saturating_sub(1);
         }
     }
-
-    pub fn border_style(&mut self, style: Style) {
-        self.border_style = style;
-    }
 }
 
-impl Component for InputField {
+impl Component for StrInputField {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match key.code {
             KeyCode::Right => self.try_move_cursor_right(),

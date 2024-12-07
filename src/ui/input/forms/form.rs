@@ -2,13 +2,14 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::prelude::*;
 
 use crate::action::Action;
-use crate::ui::components::{InputField, Selector2D};
+use crate::ui::components::Selector2D;
+use crate::ui::input::fields::InputField;
 use crate::ui::Component;
 
 pub struct Form {
     is_selected_field_active: bool,
     selector: Selector2D,
-    layout: Vec<Vec<InputField>>,
+    layout: Vec<Vec<Box<dyn InputField>>>,
     field_style: Style,
     selected_field_style: Style,
     active_field_style: Style,
@@ -19,9 +20,9 @@ impl Form {
     pub fn new<O, I>(layout: O) -> Self
     where
         O: IntoIterator<Item = I>,
-        I: IntoIterator<Item = InputField>,
+        I: IntoIterator<Item = Box<dyn InputField>>,
     {
-        let layout: Vec<Vec<InputField>> = layout
+        let layout: Vec<Vec<Box<dyn InputField>>> = layout
             .into_iter()
             .map(|row| row.into_iter().collect())
             .collect();
@@ -69,7 +70,7 @@ impl Form {
         Ok(None)
     }
 
-    fn selected_field(&mut self) -> &mut InputField {
+    fn selected_field(&mut self) -> &mut Box<dyn InputField> {
         let (row, col) = self.selector.selected();
         &mut self.layout[row][col]
     }
