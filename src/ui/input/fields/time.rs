@@ -25,8 +25,8 @@ impl InputField for TimeInputField {
 #[allow(dead_code)]
 impl TimeInputField {
     pub fn new(title: String) -> Self {
-        let hours = IntInputField::new("Hours".into(), 2, None);
-        let minutes = IntInputField::new("Minutes".into(), 2, None);
+        let hours = IntInputField::new("Hours".into(), 23, None);
+        let minutes = IntInputField::new("Minutes".into(), 59, None);
         Self {
             hours,
             minutes,

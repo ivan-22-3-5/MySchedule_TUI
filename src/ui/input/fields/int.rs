@@ -7,11 +7,14 @@ use ratatui::layout::Rect;
 use ratatui::style::Style;
 use ratatui::Frame;
 
-pub struct IntInputField(StrInputField);
+pub struct IntInputField {
+    max: u32,
+    field: StrInputField,
+}
 
 impl InputField for IntInputField {
     delegate! {
-        to self.0 {
+        to self.field {
             fn get_value(&self) -> String;
             fn border_style(&mut self, style: Style);
         }
@@ -19,19 +22,22 @@ impl InputField for IntInputField {
 }
 #[allow(dead_code)]
 impl IntInputField {
-    pub fn new(title: String, max_length: usize, initial_number: Option<u32>) -> Self {
+    pub fn new(title: String, max: u32, initial_number: Option<u32>) -> Self {
         let initial_text = match initial_number {
             Some(n) => n.to_string(),
             None => "".into(),
         };
 
-        Self(StrInputField::new(title, max_length, Some(initial_text)))
+        Self {
+            field: StrInputField::new(title, max.to_string().len(), Some(initial_text)),
+            max,
+        }
     }
 }
 
 impl Component for IntInputField {
     delegate! {
-        to self.0 {
+        to self.field {
             fn update(&mut self, action: Action) -> color_eyre::Result<Option<Action>>;
             fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()>;
         }
@@ -39,7 +45,17 @@ impl Component for IntInputField {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match key.code {
             KeyCode::Char(c) if !c.is_ascii_digit() => Ok(None),
-            _ => Ok(self.0.handle_key_event(key)?),
+            KeyCode::Char(c) => {
+                let potential_value: u32 = format!("{}{}", self.field.get_value(), c)
+                    .parse()
+                    .expect("IntInputField should always contain a valid number");
+
+                if potential_value <= self.max {
+                    self.field.handle_key_event(key)?;
+                }
+                Ok(None)
+            }
+            _ => Ok(self.field.handle_key_event(key)?),
         }
     }
 }
