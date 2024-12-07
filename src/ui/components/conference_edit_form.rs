@@ -1,11 +1,11 @@
-use crossterm::event::KeyEvent;
-use ratatui::prelude::*;
-
 use crate::action::Action;
 use crate::models::Conference;
 use crate::theme::THEME;
 use crate::ui::components::{Form, InputField};
 use crate::ui::Component;
+use crossterm::event::KeyEvent;
+use delegate::delegate;
+use ratatui::prelude::*;
 
 pub struct ConferenceEditForm(Form);
 
@@ -29,18 +29,11 @@ impl ConferenceEditForm {
 }
 
 impl Component for ConferenceEditForm {
-    fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        self.0.handle_key_event(key)?;
-        Ok(None)
-    }
-
-    fn update(&mut self, action: Action) -> color_eyre::Result<Option<Action>> {
-        self.0.update(action)?;
-        Ok(None)
-    }
-
-    fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        self.0.draw(frame, area)?;
-        Ok(())
+    delegate! {
+        to self.0 {
+             fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>>;
+             fn update(&mut self, action: Action) -> color_eyre::Result<Option<Action>>;
+             fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()>;
+        }
     }
 }
