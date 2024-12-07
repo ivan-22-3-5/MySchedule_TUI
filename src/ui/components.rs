@@ -9,6 +9,7 @@ mod selector_2d;
 
 pub use conference_list::ConferenceList;
 pub use day_selector::DaySelector;
+pub use form::Form;
 pub use fps::FpsCounter;
 pub use input_field::InputField;
 pub use selector::Selector;
