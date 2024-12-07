@@ -1,6 +1,7 @@
 mod conference_edit_form;
 mod conference_list;
 mod day_selector;
+mod form;
 mod fps;
 mod input_field;
 mod selector;
