@@ -3,9 +3,8 @@ use crate::ui::input::fields::{BorderStyle, InputField};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Position, Rect};
-use ratatui::style::Style;
 use ratatui::text::Line;
-use ratatui::widgets::{Block, Borders};
+use ratatui::widgets::Block;
 use ratatui::Frame;
 
 pub struct StrInputField {
@@ -14,7 +13,7 @@ pub struct StrInputField {
     cursor: usize,
     max_length: usize,
     is_cursor_visible: bool,
-    border_style: (Borders, Style),
+    border_style: Option<BorderStyle>,
 }
 
 impl InputField for StrInputField {
@@ -22,7 +21,7 @@ impl InputField for StrInputField {
         self.text.iter().collect()
     }
 
-    fn border_style(&mut self, border_style: BorderStyle) {
+    fn border_style(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
     }
     fn set_cursor_visibility(&mut self, visible: bool) {
@@ -32,16 +31,16 @@ impl InputField for StrInputField {
 
 #[allow(dead_code)]
 impl StrInputField {
-    pub fn new(title: String, max_length: usize, initial_text: Option<String>) -> Self {
+    pub fn new(title: Option<String>, max_length: usize, initial_text: Option<String>) -> Self {
         let initial_text: Vec<char> = initial_text
             .unwrap_or_default()
             .chars()
             .take(max_length)
             .collect();
         Self {
-            title,
+            title: title.unwrap_or_default(),
             max_length,
-            border_style: (Borders::ALL, Style::default()),
+            border_style: None,
             cursor: initial_text.len(),
             text: initial_text,
             is_cursor_visible: false,
@@ -88,20 +87,21 @@ impl Component for StrInputField {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let block = Block::default()
-            .borders(self.border_style.0)
-            .border_style(self.border_style.1)
-            .title(self.title.clone());
-
-        let input_area = block.inner(area);
-        if self.is_cursor_visible {
-            frame.set_cursor_position(Position::new(
-                input_area.x + self.cursor as u16,
-                input_area.y,
-            ));
+        let mut area = area;
+        if let Some(bs) = self.border_style {
+            let block = Block::default()
+                .borders(bs.0)
+                .border_style(bs.1)
+                .title(self.title.clone());
+            frame.render_widget(block.clone(), area);
+            area = block.inner(area);
         }
-        frame.render_widget(Line::from(self.text.iter().collect::<String>()), input_area);
-        frame.render_widget(block, area);
+
+        if self.is_cursor_visible {
+            frame.set_cursor_position(Position::new(area.x + self.cursor as u16, area.y));
+        }
+        frame.render_widget(Line::from(self.text.iter().collect::<String>()), area);
+
         Ok(())
     }
 }

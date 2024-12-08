@@ -16,14 +16,14 @@ impl ConferenceEditForm {
         let field_layout: Vec<Vec<Box<dyn InputField>>> = vec![
             vec![
                 Box::new(StrInputField::new(
-                    "Title".into(),
+                    Some("Title".into()),
                     50,
                     Some(conference.title),
                 )),
-                Box::new(TimeInputField::new("Start Time".into())),
+                Box::new(TimeInputField::new(Some("Start Time".into()))),
             ],
             vec![Box::new(StrInputField::new(
-                "Link".into(),
+                Some("Link".into()),
                 50,
                 Some(conference.link),
             ))],

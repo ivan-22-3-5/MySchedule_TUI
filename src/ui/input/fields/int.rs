@@ -15,14 +15,14 @@ impl InputField for IntInputField {
     delegate! {
         to self.field {
             fn get_value(&self) -> String;
-            fn border_style(&mut self, border_style: BorderStyle);
+            fn border_style(&mut self, border_style: Option<BorderStyle>);
             fn set_cursor_visibility(&mut self, visible: bool);
         }
     }
 }
 #[allow(dead_code)]
 impl IntInputField {
-    pub fn new(title: String, max: u32, initial_number: Option<u32>) -> Self {
+    pub fn new(title: Option<String>, max: u32, initial_number: Option<u32>) -> Self {
         let initial_text = match initial_number {
             Some(n) => n.to_string(),
             None => "".into(),

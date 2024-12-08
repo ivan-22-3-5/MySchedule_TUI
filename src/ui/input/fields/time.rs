@@ -4,16 +4,15 @@ use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::Style;
 use ratatui::text::Span;
-use ratatui::widgets::{Block, Borders};
+use ratatui::widgets::Block;
 use ratatui::Frame;
 
 pub struct TimeInputField {
     hours: IntInputField,
     minutes: IntInputField,
     title: String,
-    border_style: (Borders, Style),
+    border_style: Option<BorderStyle>,
     is_cursor_visible: bool,
 }
 
@@ -21,7 +20,7 @@ impl InputField for TimeInputField {
     fn get_value(&self) -> String {
         format!("{}:{}", self.hours.get_value(), self.minutes.get_value())
     }
-    fn border_style(&mut self, border_style: BorderStyle) {
+    fn border_style(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
     }
     fn set_cursor_visibility(&mut self, visible: bool) {
@@ -30,17 +29,13 @@ impl InputField for TimeInputField {
 }
 #[allow(dead_code)]
 impl TimeInputField {
-    pub fn new(title: String) -> Self {
-        let mut hours = IntInputField::new("Hours".into(), 23, None);
-        let mut minutes = IntInputField::new("Minutes".into(), 59, None);
-        hours.border_style((Borders::NONE, Style::default()));
-        minutes.border_style((Borders::NONE, Style::default()));
+    pub fn new(title: Option<String>) -> Self {
         Self {
-            hours,
-            minutes,
-            border_style: (Borders::ALL, Style::default()),
+            hours: IntInputField::new(None, 23, None),
+            minutes: IntInputField::new(None, 59, None),
+            border_style: None,
             is_cursor_visible: false,
-            title,
+            title: title.unwrap_or_default(),
         }
     }
 }
@@ -63,16 +58,19 @@ impl Component for TimeInputField {
         Ok(None)
     }
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let block = Block::default()
-            .title(self.title.clone())
-            .borders(self.border_style.0)
-            .border_style(self.border_style.1);
-        let layout = Layout::horizontal([
-            Constraint::Percentage(45),
-            Constraint::Percentage(10),
-            Constraint::Percentage(45),
-        ])
-        .split(block.inner(area));
+        let mut area = area;
+        if let Some(bs) = self.border_style {
+            let block = Block::default()
+                .title(self.title.clone())
+                .borders(bs.0)
+                .border_style(bs.1);
+            frame.render_widget(block.clone(), area);
+            area = block.inner(area);
+        }
+
+        let layout =
+            Layout::horizontal([Constraint::Max(2), Constraint::Max(1), Constraint::Max(2)])
+                .split(area);
         self.minutes.set_cursor_visibility(false);
         self.hours.set_cursor_visibility(false);
         if self.is_cursor_visible {
@@ -82,7 +80,6 @@ impl Component for TimeInputField {
                 self.minutes.set_cursor_visibility(true);
             }
         }
-        frame.render_widget(block, area);
         self.hours.draw(frame, layout[0])?;
         frame.render_widget(Span::raw(":"), layout[1]);
         self.minutes.draw(frame, layout[2])?;
