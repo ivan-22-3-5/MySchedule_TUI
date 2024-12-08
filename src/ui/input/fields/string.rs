@@ -55,7 +55,7 @@ impl StrInputField {
     }
 
     fn try_move_cursor_right(&mut self) {
-        if self.cursor < self.text.len() - 1 {
+        if self.cursor < self.text.len() {
             self.cursor = self.cursor.saturating_add(1);
         }
     }
