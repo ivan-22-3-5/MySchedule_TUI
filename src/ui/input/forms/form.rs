@@ -54,6 +54,9 @@ impl Form {
     //endregion style setters
 
     fn handle_field_selection(&mut self, key: KeyEvent) {
+        let field_style = self.field_style;
+        self.selected_field()
+            .border_style((Borders::ALL, field_style));
         match key.code {
             KeyCode::Up => self.selector.move_up(),
             KeyCode::Down => self.selector.move_down(),
@@ -61,6 +64,9 @@ impl Form {
             KeyCode::Right => self.selector.move_right(),
             _ => {}
         }
+        let selected_field_style = self.selected_field_style;
+        self.selected_field()
+            .border_style((Borders::ALL, selected_field_style))
     }
 
     fn propagate_key(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
@@ -98,6 +104,9 @@ impl Component for Form {
             match key.code {
                 KeyCode::Esc => {
                     self.is_selected_field_active = false;
+                    let selected_field_style = self.selected_field_style;
+                    self.selected_field()
+                        .border_style((Borders::ALL, selected_field_style))
                 }
                 _ => {
                     self.propagate_key(key)?;
@@ -107,6 +116,9 @@ impl Component for Form {
             match key.code {
                 KeyCode::Enter => {
                     self.is_selected_field_active = true;
+                    let active_field_style = self.active_field_style;
+                    self.selected_field()
+                        .border_style((Borders::ALL, active_field_style))
                 }
                 _ => {
                     self.handle_field_selection(key);
@@ -125,22 +137,6 @@ impl Component for Form {
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let layout = self.build_layout(area);
-
-        for row in self.layout.iter_mut() {
-            for field in row.iter_mut() {
-                field.border_style((Borders::ALL, self.field_style));
-            }
-        }
-
-        if self.is_selected_field_active {
-            let active_field_style = self.active_field_style;
-            self.selected_field()
-                .border_style((Borders::ALL, active_field_style))
-        } else {
-            let selected_field_style = self.selected_field_style;
-            self.selected_field()
-                .border_style((Borders::ALL, selected_field_style))
-        }
 
         for (row_index, row) in self.layout.iter_mut().enumerate() {
             for (col_index, field) in row.iter_mut().enumerate() {
