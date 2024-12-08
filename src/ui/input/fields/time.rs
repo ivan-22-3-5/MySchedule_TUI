@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::ui::input::fields::{InputField, IntInputField};
+use crate::ui::input::fields::{BorderStyle, InputField, IntInputField};
 use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
@@ -19,8 +19,8 @@ impl InputField for TimeInputField {
     fn get_value(&self) -> String {
         format!("{}:{}", self.hours.get_value(), self.minutes.get_value())
     }
-    fn border_style(&mut self, borders: Borders, style: Style) {
-        self.border_style = (borders, style);
+    fn border_style(&mut self, border_style: BorderStyle) {
+        self.border_style = border_style;
     }
 }
 #[allow(dead_code)]
@@ -58,10 +58,8 @@ impl Component for TimeInputField {
         let _ = self.title; // to appease clippy
         let layout =
             Layout::horizontal([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)]).split(area);
-        self.hours
-            .border_style(self.border_style.0, self.border_style.1);
-        self.minutes
-            .border_style(self.border_style.0, self.border_style.1);
+        self.hours.border_style(self.border_style);
+        self.minutes.border_style(self.border_style);
         self.hours.draw(frame, layout[0])?;
         self.minutes.draw(frame, layout[1])?;
         Ok(())

@@ -1,11 +1,9 @@
 use crate::action::Action;
-use crate::ui::input::fields::{InputField, StrInputField};
+use crate::ui::input::fields::{BorderStyle, InputField, StrInputField};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use delegate::delegate;
 use ratatui::layout::Rect;
-use ratatui::style::Style;
-use ratatui::widgets::Borders;
 use ratatui::Frame;
 
 pub struct IntInputField {
@@ -17,7 +15,7 @@ impl InputField for IntInputField {
     delegate! {
         to self.field {
             fn get_value(&self) -> String;
-            fn border_style(&mut self, borders: Borders, style: Style);
+            fn border_style(&mut self, border_style: BorderStyle);
         }
     }
 }

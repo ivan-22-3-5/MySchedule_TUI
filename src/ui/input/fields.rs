@@ -8,7 +8,9 @@ use ratatui::widgets::Borders;
 pub use string::StrInputField;
 pub use time::TimeInputField;
 
+type BorderStyle = (Borders, Style);
+
 pub trait InputField: Component {
     fn get_value(&self) -> String;
-    fn border_style(&mut self, borders: Borders, style: Style);
+    fn border_style(&mut self, border_style: BorderStyle);
 }

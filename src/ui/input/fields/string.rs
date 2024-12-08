@@ -1,6 +1,6 @@
 use crate::action::Action;
 use crate::theme::THEME;
-use crate::ui::input::fields::InputField;
+use crate::ui::input::fields::{BorderStyle, InputField};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
@@ -24,8 +24,8 @@ impl InputField for StrInputField {
         self.text.iter().take(self.text.len() - 1).collect()
     }
 
-    fn border_style(&mut self, borders: Borders, style: Style) {
-        self.border_style = (borders, style);
+    fn border_style(&mut self, border_style: BorderStyle) {
+        self.border_style = border_style;
     }
 }
 
@@ -123,7 +123,7 @@ impl Component for StrInputField {
         let text = self.get_styled_text();
 
         let block = Block::default()
-            .borders(Borders::ALL)
+            .borders(self.border_style.0)
             .border_style(self.border_style.1)
             .title(self.title.clone());
         frame.render_widget(text, block.inner(area));
