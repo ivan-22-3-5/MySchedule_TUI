@@ -1,10 +1,10 @@
-use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::prelude::*;
-
 use crate::action::Action;
 use crate::ui::components::Selector2D;
 use crate::ui::input::fields::InputField;
 use crate::ui::Component;
+use crossterm::event::{KeyCode, KeyEvent};
+use ratatui::prelude::*;
+use ratatui::widgets::Borders;
 
 pub struct Form {
     is_selected_field_active: bool,
@@ -128,16 +128,18 @@ impl Component for Form {
 
         for row in self.layout.iter_mut() {
             for field in row.iter_mut() {
-                field.border_style(self.field_style);
+                field.border_style(Borders::ALL, self.field_style);
             }
         }
 
         if self.is_selected_field_active {
             let active_field_style = self.active_field_style;
-            self.selected_field().border_style(active_field_style)
+            self.selected_field()
+                .border_style(Borders::ALL, active_field_style)
         } else {
             let selected_field_style = self.selected_field_style;
-            self.selected_field().border_style(selected_field_style)
+            self.selected_field()
+                .border_style(Borders::ALL, selected_field_style)
         }
 
         for (row_index, row) in self.layout.iter_mut().enumerate() {

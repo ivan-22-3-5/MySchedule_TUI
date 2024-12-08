@@ -16,7 +16,7 @@ pub struct StrInputField {
     max_length: usize,
     ticks_with_cursor: u8,
     showing_cursor_period: u8,
-    border_style: Style,
+    border_style: (Borders, Style),
 }
 
 impl InputField for StrInputField {
@@ -24,8 +24,8 @@ impl InputField for StrInputField {
         self.text.iter().take(self.text.len() - 1).collect()
     }
 
-    fn border_style(&mut self, style: Style) {
-        self.border_style = style;
+    fn border_style(&mut self, borders: Borders, style: Style) {
+        self.border_style = (borders, style);
     }
 }
 
@@ -42,7 +42,7 @@ impl StrInputField {
         Self {
             title,
             max_length,
-            border_style: Style::default(),
+            border_style: (Borders::ALL, Style::default()),
             text: initial_text,
             cursor: initial_cursor,
             ticks_with_cursor: 0,
@@ -124,7 +124,7 @@ impl Component for StrInputField {
 
         let block = Block::default()
             .borders(Borders::ALL)
-            .border_style(self.border_style)
+            .border_style(self.border_style.1)
             .title(self.title.clone());
         frame.render_widget(text, block.inner(area));
         frame.render_widget(block, area);

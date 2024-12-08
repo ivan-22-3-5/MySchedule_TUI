@@ -5,6 +5,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use delegate::delegate;
 use ratatui::layout::Rect;
 use ratatui::style::Style;
+use ratatui::widgets::Borders;
 use ratatui::Frame;
 
 pub struct IntInputField {
@@ -16,7 +17,7 @@ impl InputField for IntInputField {
     delegate! {
         to self.field {
             fn get_value(&self) -> String;
-            fn border_style(&mut self, style: Style);
+            fn border_style(&mut self, borders: Borders, style: Style);
         }
     }
 }
