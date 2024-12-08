@@ -63,7 +63,12 @@ impl Component for TimeInputField {
         Ok(None)
     }
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let mut area = area;
+        let mut width = self.title.len() + 2;
+        if width % 2 == 0 {
+            width += 1;
+        }
+        let area = Layout::horizontal([Constraint::Length(width as u16)]).split(area)[0];
+        let mut area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
         if let Some(bs) = self.border_style {
             let block = Block::default()
                 .title(self.title.clone())
@@ -72,10 +77,14 @@ impl Component for TimeInputField {
             frame.render_widget(block.clone(), area);
             area = block.inner(area);
         }
-
-        let layout =
-            Layout::horizontal([Constraint::Max(2), Constraint::Max(1), Constraint::Max(2)])
-                .split(area);
+        let [_, hours, colon, minutes, _] = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Length(2),
+            Constraint::Length(1),
+            Constraint::Length(2),
+            Constraint::Fill(1),
+        ])
+        .areas(area);
         self.minutes.set_cursor_visibility(false);
         self.hours.set_cursor_visibility(false);
         if self.is_cursor_visible {
@@ -85,9 +94,9 @@ impl Component for TimeInputField {
                 self.minutes.set_cursor_visibility(true);
             }
         }
-        self.hours.draw(frame, layout[0])?;
-        frame.render_widget(Span::raw(":"), layout[1]);
-        self.minutes.draw(frame, layout[2])?;
+        self.hours.draw(frame, hours)?;
+        frame.render_widget(Span::raw(":"), colon);
+        self.minutes.draw(frame, minutes)?;
         Ok(())
     }
 }
