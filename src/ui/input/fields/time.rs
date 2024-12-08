@@ -5,7 +5,7 @@ use crossterm::event::KeyEvent;
 use delegate::delegate;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::Style;
-use ratatui::widgets::Borders;
+use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 
 pub struct TimeInputField {
@@ -26,8 +26,10 @@ impl InputField for TimeInputField {
 #[allow(dead_code)]
 impl TimeInputField {
     pub fn new(title: String) -> Self {
-        let hours = IntInputField::new("Hours".into(), 23, None);
-        let minutes = IntInputField::new("Minutes".into(), 59, None);
+        let mut hours = IntInputField::new("Hours".into(), 23, None);
+        let mut minutes = IntInputField::new("Minutes".into(), 59, None);
+        hours.border_style((Borders::NONE, Style::default()));
+        minutes.border_style((Borders::NONE, Style::default()));
         Self {
             hours,
             minutes,
@@ -55,11 +57,13 @@ impl Component for TimeInputField {
         Ok(None)
     }
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let _ = self.title; // to appease clippy
-        let layout =
-            Layout::horizontal([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)]).split(area);
-        self.hours.border_style(self.border_style);
-        self.minutes.border_style(self.border_style);
+        let block = Block::default()
+            .title(self.title.clone())
+            .borders(self.border_style.0)
+            .border_style(self.border_style.1);
+        let layout = Layout::horizontal([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)])
+            .split(block.inner(area));
+        frame.render_widget(block, area);
         self.hours.draw(frame, layout[0])?;
         self.minutes.draw(frame, layout[1])?;
         Ok(())
