@@ -4,8 +4,9 @@ use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
 use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::prelude::Style;
 use ratatui::text::Span;
-use ratatui::widgets::Block;
+use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 
 pub struct TimeInputField {
@@ -20,7 +21,7 @@ impl InputField for TimeInputField {
     fn get_value(&self) -> String {
         format!("{}:{}", self.hours.get_value(), self.minutes.get_value())
     }
-    fn border_style(&mut self, border_style: Option<BorderStyle>) {
+    fn borders(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
     }
     fn set_cursor_visibility(&mut self, visible: bool) {
@@ -30,10 +31,14 @@ impl InputField for TimeInputField {
 #[allow(dead_code)]
 impl TimeInputField {
     pub fn new(title: Option<String>) -> Self {
+        let mut hours = IntInputField::new(None, 23, None);
+        let mut minutes = IntInputField::new(None, 59, None);
+        hours.borders(None);
+        minutes.borders(None);
         Self {
-            hours: IntInputField::new(None, 23, None),
-            minutes: IntInputField::new(None, 59, None),
-            border_style: None,
+            hours,
+            minutes,
+            border_style: Some((Borders::ALL, Style::default())),
             is_cursor_visible: false,
             title: title.unwrap_or_default(),
         }

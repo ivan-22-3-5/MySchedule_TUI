@@ -56,7 +56,7 @@ impl Form {
     fn handle_field_selection(&mut self, key: KeyEvent) {
         let field_style = self.field_style;
         self.selected_field()
-            .border_style(Some((Borders::ALL, field_style)));
+            .borders(Some((Borders::ALL, field_style)));
         match key.code {
             KeyCode::Up => self.selector.move_up(),
             KeyCode::Down => self.selector.move_down(),
@@ -66,7 +66,7 @@ impl Form {
         }
         let selected_field_style = self.selected_field_style;
         self.selected_field()
-            .border_style(Some((Borders::ALL, selected_field_style)))
+            .borders(Some((Borders::ALL, selected_field_style)))
     }
 
     fn propagate_key(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
@@ -106,7 +106,7 @@ impl Component for Form {
                     self.is_selected_field_active = false;
                     let selected_field_style = self.selected_field_style;
                     self.selected_field()
-                        .border_style(Some((Borders::ALL, selected_field_style)));
+                        .borders(Some((Borders::ALL, selected_field_style)));
                     self.selected_field().set_cursor_visibility(false);
                 }
                 _ => {
@@ -119,7 +119,7 @@ impl Component for Form {
                     self.is_selected_field_active = true;
                     let active_field_style = self.active_field_style;
                     self.selected_field()
-                        .border_style(Some((Borders::ALL, active_field_style)));
+                        .borders(Some((Borders::ALL, active_field_style)));
                     self.selected_field().set_cursor_visibility(true);
                 }
                 _ => {

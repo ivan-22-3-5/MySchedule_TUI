@@ -15,7 +15,7 @@ impl InputField for IntInputField {
     delegate! {
         to self.field {
             fn get_value(&self) -> String;
-            fn border_style(&mut self, border_style: Option<BorderStyle>);
+            fn borders(&mut self, border_style: Option<BorderStyle>);
             fn set_cursor_visibility(&mut self, visible: bool);
         }
     }

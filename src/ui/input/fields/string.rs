@@ -3,8 +3,9 @@ use crate::ui::input::fields::{BorderStyle, InputField};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Position, Rect};
+use ratatui::prelude::Style;
 use ratatui::text::Line;
-use ratatui::widgets::Block;
+use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 
 pub struct StrInputField {
@@ -21,7 +22,7 @@ impl InputField for StrInputField {
         self.text.iter().collect()
     }
 
-    fn border_style(&mut self, border_style: Option<BorderStyle>) {
+    fn borders(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
     }
     fn set_cursor_visibility(&mut self, visible: bool) {
@@ -40,7 +41,7 @@ impl StrInputField {
         Self {
             title: title.unwrap_or_default(),
             max_length,
-            border_style: None,
+            border_style: Some((Borders::ALL, Style::default())),
             cursor: initial_text.len(),
             text: initial_text,
             is_cursor_visible: false,
