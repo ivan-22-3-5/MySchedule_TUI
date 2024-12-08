@@ -5,6 +5,7 @@ use crossterm::event::KeyEvent;
 use delegate::delegate;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::Style;
+use ratatui::text::Span;
 use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 
@@ -13,6 +14,7 @@ pub struct TimeInputField {
     minutes: IntInputField,
     title: String,
     border_style: (Borders, Style),
+    is_cursor_visible: bool,
 }
 
 impl InputField for TimeInputField {
@@ -21,6 +23,9 @@ impl InputField for TimeInputField {
     }
     fn border_style(&mut self, border_style: BorderStyle) {
         self.border_style = border_style;
+    }
+    fn set_cursor_visibility(&mut self, visible: bool) {
+        self.is_cursor_visible = visible
     }
 }
 #[allow(dead_code)]
@@ -34,6 +39,7 @@ impl TimeInputField {
             hours,
             minutes,
             border_style: (Borders::ALL, Style::default()),
+            is_cursor_visible: false,
             title,
         }
     }
@@ -61,11 +67,25 @@ impl Component for TimeInputField {
             .title(self.title.clone())
             .borders(self.border_style.0)
             .border_style(self.border_style.1);
-        let layout = Layout::horizontal([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)])
-            .split(block.inner(area));
+        let layout = Layout::horizontal([
+            Constraint::Percentage(45),
+            Constraint::Percentage(10),
+            Constraint::Percentage(45),
+        ])
+        .split(block.inner(area));
+        self.minutes.set_cursor_visibility(false);
+        self.hours.set_cursor_visibility(false);
+        if self.is_cursor_visible {
+            if self.hours.get_value().len() != 2 {
+                self.hours.set_cursor_visibility(true);
+            } else {
+                self.minutes.set_cursor_visibility(true);
+            }
+        }
         frame.render_widget(block, area);
         self.hours.draw(frame, layout[0])?;
-        self.minutes.draw(frame, layout[1])?;
+        frame.render_widget(Span::raw(":"), layout[1]);
+        self.minutes.draw(frame, layout[2])?;
         Ok(())
     }
 }

@@ -106,7 +106,8 @@ impl Component for Form {
                     self.is_selected_field_active = false;
                     let selected_field_style = self.selected_field_style;
                     self.selected_field()
-                        .border_style((Borders::ALL, selected_field_style))
+                        .border_style((Borders::ALL, selected_field_style));
+                    self.selected_field().set_cursor_visibility(false);
                 }
                 _ => {
                     self.propagate_key(key)?;
@@ -118,7 +119,8 @@ impl Component for Form {
                     self.is_selected_field_active = true;
                     let active_field_style = self.active_field_style;
                     self.selected_field()
-                        .border_style((Borders::ALL, active_field_style))
+                        .border_style((Borders::ALL, active_field_style));
+                    self.selected_field().set_cursor_visibility(true);
                 }
                 _ => {
                     self.handle_field_selection(key);
