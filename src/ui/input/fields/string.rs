@@ -61,7 +61,7 @@ impl StrInputField {
     }
 
     fn type_char(&mut self, c: char) {
-        if self.text.len() <= self.max_length {
+        if self.text.len() < self.max_length {
             self.text.insert(self.cursor, c);
             self.cursor = self.cursor.saturating_add(1);
         }
