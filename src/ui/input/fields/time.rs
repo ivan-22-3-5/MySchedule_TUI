@@ -85,18 +85,13 @@ impl Component for TimeInputField {
             Constraint::Fill(1),
         ])
         .areas(area);
-        self.minutes.set_cursor_visibility(false);
-        self.hours.set_cursor_visibility(false);
-        if self.is_cursor_visible {
-            if self.hours.get_value().len() != 2 {
-                self.hours.set_cursor_visibility(true);
-            } else {
-                self.minutes.set_cursor_visibility(true);
-            }
-        }
+        self.minutes
+            .set_cursor_visibility(self.is_cursor_visible && self.hours.get_value().len() == 2);
+        self.hours
+            .set_cursor_visibility(self.is_cursor_visible && self.hours.get_value().len() != 2);
         self.hours.draw(frame, hours)?;
-        frame.render_widget(Span::raw(":"), colon);
         self.minutes.draw(frame, minutes)?;
+        frame.render_widget(Span::raw(":"), colon);
         Ok(())
     }
 }
