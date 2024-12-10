@@ -2,7 +2,7 @@ use crate::action::Action;
 use crate::ui::input::fields::{BorderStyle, InputField};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::layout::{Position, Rect};
+use ratatui::layout::Rect;
 use ratatui::prelude::Style;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
@@ -99,7 +99,7 @@ impl Component for StrInputField {
         }
 
         if self.is_cursor_visible {
-            frame.set_cursor_position(Position::new(area.x + self.cursor as u16, area.y));
+            frame.set_cursor_position((area.x + self.cursor as u16, area.y));
         }
         frame.render_widget(Line::from(self.text.iter().collect::<String>()), area);
 

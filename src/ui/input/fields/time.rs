@@ -64,9 +64,7 @@ impl Component for TimeInputField {
     }
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let mut width = self.title.len() + 2;
-        if width % 2 == 0 {
-            width += 1;
-        }
+        width += std::cmp::max((width + 1) % 2, 9);
         let area = Layout::horizontal([Constraint::Length(width as u16)]).split(area)[0];
         let mut area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
         if let Some(bs) = self.border_style {
