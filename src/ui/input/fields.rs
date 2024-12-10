@@ -1,9 +1,11 @@
+mod input_handler;
 mod int;
 mod string;
 mod time;
 
 use crate::ui::Component;
 
+pub use input_handler::InputHandler;
 pub use int::IntInputField;
 pub use string::StrInputField;
 pub use time::TimeInputField;
