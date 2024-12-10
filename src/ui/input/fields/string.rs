@@ -1,12 +1,84 @@
 use crate::action::Action;
-use crate::ui::input::fields::{BorderStyle, InputField, InputHandler};
+use crate::ui::input::fields::{BorderStyle, InputField};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
+use delegate::delegate;
 use ratatui::layout::Rect;
 use ratatui::prelude::Style;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
+
+pub struct InputHandler {
+    text: Vec<char>,
+    cursor: usize,
+    max_length: usize,
+}
+
+#[allow(dead_code)]
+impl InputHandler {
+    pub fn new(initial_text: Option<String>, max_length: usize) -> Self {
+        let initial_text: Vec<char> = initial_text
+            .unwrap_or_default()
+            .chars()
+            .take(max_length)
+            .collect();
+        Self {
+            max_length,
+            cursor: initial_text.len(),
+            text: initial_text,
+        }
+    }
+
+    pub fn value(&self) -> String {
+        self.text.iter().collect()
+    }
+
+    pub fn cursor_position(&self) -> usize {
+        self.cursor
+    }
+
+    pub fn len(&self) -> usize {
+        self.text.len()
+    }
+
+    fn try_move_cursor_left(&mut self) {
+        if self.cursor > 0 {
+            self.cursor = self.cursor.saturating_sub(1);
+        }
+    }
+
+    fn try_move_cursor_right(&mut self) {
+        if self.cursor < self.text.len() {
+            self.cursor = self.cursor.saturating_add(1);
+        }
+    }
+
+    fn type_char(&mut self, c: char) {
+        if self.text.len() < self.max_length {
+            self.text.insert(self.cursor, c);
+            self.cursor = self.cursor.saturating_add(1);
+        }
+    }
+
+    fn backspace(&mut self) {
+        if self.cursor > 0 {
+            self.text.remove(self.cursor - 1);
+            self.cursor = self.cursor.saturating_sub(1);
+        }
+    }
+
+    pub fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
+        match key.code {
+            KeyCode::Right => self.try_move_cursor_right(),
+            KeyCode::Left => self.try_move_cursor_left(),
+            KeyCode::Char(c) => self.type_char(c),
+            KeyCode::Backspace => self.backspace(),
+            _ => (),
+        };
+        Ok(None)
+    }
+}
 
 pub struct StrInputField {
     title: String,
@@ -41,15 +113,10 @@ impl StrInputField {
 }
 
 impl Component for StrInputField {
-    fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        match key.code {
-            KeyCode::Right => self.input_handler.try_move_cursor_right(),
-            KeyCode::Left => self.input_handler.try_move_cursor_left(),
-            KeyCode::Char(c) => self.input_handler.type_char(c),
-            KeyCode::Backspace => self.input_handler.backspace(),
-            _ => (),
-        };
-        Ok(None)
+    delegate! {
+        to self.input_handler {
+            fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>>;
+        }
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
@@ -70,7 +137,6 @@ impl Component for StrInputField {
             ));
         }
         frame.render_widget(Line::from(self.input_handler.value()), area);
-
         Ok(())
     }
 }
