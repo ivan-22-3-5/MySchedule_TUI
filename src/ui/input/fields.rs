@@ -1,13 +1,17 @@
+mod input_handler;
 mod int;
 mod string;
 mod time;
+
 use crate::ui::Component;
+
+pub use input_handler::InputHandler;
 pub use int::IntInputField;
-use ratatui::prelude::Style;
-use ratatui::widgets::Borders;
 pub use string::StrInputField;
 pub use time::TimeInputField;
 
+use ratatui::prelude::Style;
+use ratatui::widgets::Borders;
 type BorderStyle = (Borders, Style);
 
 pub trait InputField: Component {
