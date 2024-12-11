@@ -3,7 +3,7 @@ use crate::ui::input::fields::{BorderStyle, InputField, InputHandler};
 use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
-use ratatui::layout::Rect;
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::prelude::Style;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
@@ -24,6 +24,7 @@ impl InputField for StrInputField {
     fn borders(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
     }
+
     fn set_cursor_visibility(&mut self, visible: bool) {
         self.is_cursor_visible = visible
     }
@@ -49,7 +50,7 @@ impl Component for StrInputField {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let mut area = area;
+        let mut area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
         if let Some(bs) = self.border_style {
             let block = Block::default()
                 .borders(bs.0)
@@ -58,7 +59,6 @@ impl Component for StrInputField {
             frame.render_widget(block.clone(), area);
             area = block.inner(area);
         }
-
         if self.is_cursor_visible {
             frame.set_cursor_position((
                 area.x + self.input_handler.cursor_position() as u16,

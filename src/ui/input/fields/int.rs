@@ -3,7 +3,7 @@ use crate::ui::input::fields::{BorderStyle, InputField, IntInputHandler};
 use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
-use ratatui::layout::Rect;
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::Style;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
@@ -49,7 +49,7 @@ impl Component for IntInputField {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let mut area = area;
+        let mut area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
         if let Some(bs) = self.border_style {
             let block = Block::default()
                 .borders(bs.0)
