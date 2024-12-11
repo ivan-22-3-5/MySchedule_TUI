@@ -89,7 +89,7 @@ impl IntInputHandler {
             initial_number.map(|n| n.to_string()),
             max.to_string().len(),
             Some(Box::new(move |s: &str| {
-                s.parse::<u32>().map_or(false, |n| n <= max)
+                s.parse::<u32>().is_ok_and(|n| n <= max)
             })),
         ))
     }
