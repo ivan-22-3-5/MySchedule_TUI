@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::ui::input::fields::{BorderStyle, InputField, InputHandler};
+use crate::ui::input::fields::{BorderStyle, InputField, IntInputHandler};
 use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
@@ -13,7 +13,7 @@ pub struct IntInputField {
     title: String,
     is_cursor_visible: bool,
     border_style: Option<BorderStyle>,
-    input_handler: InputHandler,
+    input_handler: IntInputHandler,
 }
 
 impl InputField for IntInputField {
@@ -36,13 +36,7 @@ impl IntInputField {
             title: title.unwrap_or_default(),
             border_style: Some((Borders::ALL, Style::default())),
             is_cursor_visible: false,
-            input_handler: InputHandler::new(
-                initial_number.map(|n| n.to_string()),
-                max.to_string().len(),
-                Some(Box::new(move |s: &str| {
-                    s.parse::<u32>().map_or(false, |n| n <= max)
-                })),
-            ),
+            input_handler: IntInputHandler::new(initial_number, max),
         }
     }
 }

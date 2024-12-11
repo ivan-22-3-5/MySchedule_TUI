@@ -1,5 +1,6 @@
 use crate::action::Action;
 use crossterm::event::{KeyCode, KeyEvent};
+use delegate::delegate;
 
 type ValidateFn = Box<dyn Fn(&str) -> bool>;
 
@@ -77,5 +78,28 @@ impl InputHandler {
             _ => (),
         };
         Ok(None)
+    }
+}
+
+pub struct IntInputHandler(InputHandler);
+#[allow(dead_code)]
+impl IntInputHandler {
+    pub fn new(initial_number: Option<u32>, max: u32) -> Self {
+        Self(InputHandler::new(
+            initial_number.map(|n| n.to_string()),
+            max.to_string().len(),
+            Some(Box::new(move |s: &str| {
+                s.parse::<u32>().map_or(false, |n| n <= max)
+            })),
+        ))
+    }
+
+    delegate! {
+        to self.0 {
+            pub fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>>;
+            pub fn value(&self) -> String;
+            pub fn cursor_position(&self) -> usize;
+            pub fn len(&self) -> usize;
+        }
     }
 }
