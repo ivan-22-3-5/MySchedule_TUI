@@ -1,25 +1,33 @@
 use crate::action::Action;
-use crate::ui::input::fields::{BorderStyle, InputField, IntInputField};
+use crate::theme::THEME;
+use crate::ui::input::fields::{BorderStyle, InputField, IntInputHandler};
 use crate::ui::Component;
-use crossterm::event::KeyEvent;
-use delegate::delegate;
+use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::prelude::Style;
 use ratatui::text::Span;
 use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 
+#[derive(Default)]
+enum SelectedField {
+    #[default]
+    Hours,
+    Minutes,
+}
+
 pub struct TimeInputField {
-    hours: IntInputField,
-    minutes: IntInputField,
+    hours: IntInputHandler,
+    minutes: IntInputHandler,
     title: String,
+    selected_field: SelectedField,
     border_style: Option<BorderStyle>,
     is_cursor_visible: bool,
 }
 
 impl InputField for TimeInputField {
     fn get_value(&self) -> String {
-        format!("{}:{}", self.hours.get_value(), self.minutes.get_value())
+        format!("{:02}:{:02}", self.hours.value(), self.minutes.value())
     }
     fn borders(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
@@ -31,34 +39,29 @@ impl InputField for TimeInputField {
 #[allow(dead_code)]
 impl TimeInputField {
     pub fn new(title: Option<String>) -> Self {
-        let mut hours = IntInputField::new(None, 23, None);
-        let mut minutes = IntInputField::new(None, 59, None);
-        hours.borders(None);
-        minutes.borders(None);
         Self {
-            hours,
-            minutes,
+            hours: IntInputHandler::new(None, 23),
+            minutes: IntInputHandler::new(None, 59),
             border_style: Some((Borders::ALL, Style::default())),
             is_cursor_visible: false,
+            selected_field: SelectedField::default(),
             title: title.unwrap_or_default(),
         }
     }
 }
 
 impl Component for TimeInputField {
-    delegate! {
-        to if self.hours.get_value().len() != 2 { &mut self.hours } else { &mut self.minutes } {
-            fn update(&mut self, action: Action) -> color_eyre::Result<Option<Action>>;
-        }
-    }
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        let hours_len = self.hours.get_value().len();
-        let minutes_len = self.minutes.get_value().len();
-        if minutes_len == 0 {
-            self.hours.handle_key_event(key)?;
-        }
-        if hours_len == 2 {
-            self.minutes.handle_key_event(key)?;
+        if let KeyCode::Left | KeyCode::Right = key.code {
+            self.selected_field = match self.selected_field {
+                SelectedField::Hours => SelectedField::Minutes,
+                SelectedField::Minutes => SelectedField::Hours,
+            };
+        } else {
+            match self.selected_field {
+                SelectedField::Hours => self.hours.handle_key_event(key)?,
+                SelectedField::Minutes => self.minutes.handle_key_event(key)?,
+            };
         }
         Ok(None)
     }
@@ -75,7 +78,7 @@ impl Component for TimeInputField {
             frame.render_widget(block.clone(), area);
             area = block.inner(area);
         }
-        let [_, hours, colon, minutes, _] = Layout::horizontal([
+        let [_, hours_area, colon_area, minutes_area, _] = Layout::horizontal([
             Constraint::Fill(1),
             Constraint::Length(2),
             Constraint::Length(1),
@@ -83,13 +86,19 @@ impl Component for TimeInputField {
             Constraint::Fill(1),
         ])
         .areas(area);
-        self.minutes
-            .set_cursor_visibility(self.is_cursor_visible && self.hours.get_value().len() == 2);
-        self.hours
-            .set_cursor_visibility(self.is_cursor_visible && self.hours.get_value().len() != 2);
-        self.hours.draw(frame, hours)?;
-        self.minutes.draw(frame, minutes)?;
-        frame.render_widget(Span::raw(":"), colon);
+
+        let mut minutes = Span::raw(format!("{:02}", self.minutes.value()));
+        let mut hours = Span::raw(format!("{:02}", self.hours.value()));
+        if self.is_cursor_visible {
+            match self.selected_field {
+                SelectedField::Hours => hours.style = THEME.selected,
+                SelectedField::Minutes => minutes.style = THEME.selected,
+            };
+        }
+
+        frame.render_widget(hours, hours_area);
+        frame.render_widget(minutes, minutes_area);
+        frame.render_widget(Span::raw(":"), colon_area);
         Ok(())
     }
 }

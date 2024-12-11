@@ -18,7 +18,7 @@ pub struct IntInputField {
 
 impl InputField for IntInputField {
     fn get_value(&self) -> String {
-        self.input_handler.value()
+        self.input_handler.value().to_string()
     }
 
     fn borders(&mut self, border_style: Option<BorderStyle>) {
@@ -65,7 +65,7 @@ impl Component for IntInputField {
                 area.y,
             ));
         }
-        frame.render_widget(Line::from(self.input_handler.value()), area);
+        frame.render_widget(Line::from(self.input_handler.value().to_string()), area);
 
         Ok(())
     }

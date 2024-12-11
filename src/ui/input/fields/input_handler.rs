@@ -94,10 +94,13 @@ impl IntInputHandler {
         ))
     }
 
+    pub fn value(&self) -> u32 {
+        self.0.value().parse().unwrap_or_default()
+    }
+
     delegate! {
         to self.0 {
             pub fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>>;
-            pub fn value(&self) -> String;
             pub fn cursor_position(&self) -> usize;
             pub fn len(&self) -> usize;
         }
