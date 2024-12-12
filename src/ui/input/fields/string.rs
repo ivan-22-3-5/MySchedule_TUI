@@ -14,6 +14,7 @@ pub struct StrInputField {
     is_cursor_visible: bool,
     border_style: Option<BorderStyle>,
     input_handler: InputHandler,
+    left_padding: u16,
 }
 
 impl InputField for StrInputField {
@@ -38,6 +39,7 @@ impl StrInputField {
             border_style: Some((Borders::ALL, Style::default())),
             is_cursor_visible: false,
             input_handler: InputHandler::new(initial_text, max_length, None),
+            left_padding: 0,
         }
     }
 }
@@ -59,13 +61,30 @@ impl Component for StrInputField {
             frame.render_widget(block.clone(), area);
             area = block.inner(area);
         }
-        if self.is_cursor_visible {
-            frame.set_cursor_position((
-                area.x + self.input_handler.cursor_position() as u16,
-                area.y,
-            ));
+        let width = area.width;
+        let text_len = self.input_handler.len() as u16;
+        let cursor_pos = self.input_handler.cursor_position() as u16;
+
+        if !(self.left_padding..width + self.left_padding).contains(&cursor_pos) {
+            if cursor_pos < self.left_padding {
+                self.left_padding = cursor_pos;
+            } else if cursor_pos > self.left_padding + width {
+                self.left_padding = cursor_pos - width;
+            }
         }
-        frame.render_widget(Line::from(self.input_handler.value()), area);
+        self.left_padding = self.left_padding.min(text_len.saturating_sub(width));
+
+        if self.is_cursor_visible {
+            frame.set_cursor_position((area.x + cursor_pos - self.left_padding, area.y));
+        }
+        let string_slice_to_show: String = self
+            .input_handler
+            .value()
+            .chars()
+            .skip(self.left_padding as usize)
+            .take(width as usize)
+            .collect();
+        frame.render_widget(Line::from(string_slice_to_show), area);
         Ok(())
     }
 }
