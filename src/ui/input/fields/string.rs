@@ -42,6 +42,21 @@ impl StrInputField {
             left_padding: 0,
         }
     }
+
+    fn calculate_padding(&self, width: u16) -> u16 {
+        let text_len = self.input_handler.len() as u16;
+        let cursor_pos = self.input_handler.cursor_position() as u16;
+
+        let mut padding = self.left_padding;
+        if !(padding..width + padding).contains(&cursor_pos) {
+            if cursor_pos < padding {
+                padding = cursor_pos;
+            } else if cursor_pos > padding + width {
+                padding = cursor_pos - width;
+            }
+        }
+        padding.min(text_len.saturating_sub(width))
+    }
 }
 
 impl Component for StrInputField {
@@ -62,20 +77,13 @@ impl Component for StrInputField {
             area = block.inner(area);
         }
         let width = area.width;
-        let text_len = self.input_handler.len() as u16;
-        let cursor_pos = self.input_handler.cursor_position() as u16;
-
-        if !(self.left_padding..width + self.left_padding).contains(&cursor_pos) {
-            if cursor_pos < self.left_padding {
-                self.left_padding = cursor_pos;
-            } else if cursor_pos > self.left_padding + width {
-                self.left_padding = cursor_pos - width;
-            }
-        }
-        self.left_padding = self.left_padding.min(text_len.saturating_sub(width));
+        self.left_padding = self.calculate_padding(width - 1);
 
         if self.is_cursor_visible {
-            frame.set_cursor_position((area.x + cursor_pos - self.left_padding, area.y));
+            frame.set_cursor_position((
+                area.x + self.input_handler.cursor_position() as u16 - self.left_padding,
+                area.y,
+            ));
         }
         let string_slice_to_show: String = self
             .input_handler
