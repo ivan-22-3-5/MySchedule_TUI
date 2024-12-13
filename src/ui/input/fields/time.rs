@@ -1,6 +1,7 @@
 use crate::action::Action;
 use crate::theme::THEME;
-use crate::ui::input::fields::{BorderStyle, InputField, IntInputHandler};
+use crate::ui::input::fields::int::IntInputHandler;
+use crate::ui::input::fields::{BorderStyle, InputField, InputHandler};
 use crate::ui::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Constraint, Layout, Rect};
@@ -87,8 +88,19 @@ impl Component for TimeInputField {
         ])
         .areas(area);
 
-        let mut minutes = Span::raw(format!("{:02}", self.minutes.value()));
-        let mut hours = Span::raw(format!("{:02}", self.hours.value()));
+        let hours: u8 = self
+            .hours
+            .value()
+            .parse()
+            .expect("IntInputHandler should always give valid number");
+        let minutes: u8 = self
+            .minutes
+            .value()
+            .parse()
+            .expect("IntInputHandler should always give valid number");
+
+        let mut minutes = Span::raw(format!("{:02}", minutes));
+        let mut hours = Span::raw(format!("{:02}", hours));
         if self.is_cursor_visible {
             match self.selected_field {
                 SelectedField::Hours => hours.style = THEME.selected,
