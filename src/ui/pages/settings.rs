@@ -36,7 +36,7 @@ impl Component for SettingsPage {
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let _ = self.settings; // to appease clippy
         let items = ["1", "2", "3"].map(ListItem::new);
-        let list = List::new(items).highlight_style(THEME.selected);
+        let list = List::new(items).highlight_style(THEME.selected_text);
         let mut state =
             ListState::default().with_selected(Option::from(self.selector.index as usize));
         frame.render_stateful_widget(list, area, &mut state);

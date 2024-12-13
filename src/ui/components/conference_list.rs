@@ -41,7 +41,7 @@ impl Component for ConferenceList {
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let titles = self.conferences.iter().map(|c| c.title.clone());
         let items = titles.map(ListItem::new);
-        let list = List::new(items).highlight_style(THEME.selected);
+        let list = List::new(items).highlight_style(THEME.selected_text);
         let mut state =
             ListState::default().with_selected(Option::from(self.selector.index as usize));
         frame.render_stateful_widget(list, area, &mut state);

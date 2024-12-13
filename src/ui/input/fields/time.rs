@@ -103,8 +103,8 @@ impl Component for TimeInputField {
         let mut hours = Span::raw(format!("{:02}", hours));
         if self.is_cursor_visible {
             match self.selected_field {
-                SelectedField::Hours => hours.style = THEME.selected,
-                SelectedField::Minutes => minutes.style = THEME.selected,
+                SelectedField::Hours => hours.style = THEME.selected_text,
+                SelectedField::Minutes => minutes.style = THEME.selected_text,
             };
         }
 

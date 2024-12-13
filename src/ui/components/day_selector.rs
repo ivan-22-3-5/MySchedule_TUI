@@ -43,7 +43,7 @@ impl Component for DaySelector {
             .style(Style::default().fg(Color::White))
             .divider("")
             .padding("", "")
-            .highlight_style(THEME.selected)
+            .highlight_style(THEME.selected_text)
             .select(self.day_selector.index as usize);
 
         frame.render_widget(tabs, area);
