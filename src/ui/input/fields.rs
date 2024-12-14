@@ -69,7 +69,7 @@ impl BaseInputField {
                 .min(cursor_pos); // if cursor is out of left bound set padding to cursor_pos
         }
         self.left_padding = self.left_padding.min(text_len.saturating_sub(width));
-        // move padding to the left if there is empty space
+        // move padding to the left if there is empty space that is not occupied by the text
     }
 }
 
