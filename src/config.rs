@@ -507,7 +507,7 @@ mod tests {
             c.keybindings
                 .get(&Mode::Schedule)
                 .unwrap()
-                .get(&parse_key_sequence("<q>").unwrap_or_default())
+                .get(&parse_key_sequence("<Ctrl-q>").unwrap_or_default())
                 .unwrap(),
             &Action::Quit
         );
