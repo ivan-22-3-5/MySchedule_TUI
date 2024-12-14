@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::models;
+use crate::models::Settings;
 use crate::theme::THEME;
 use crate::ui::components::Selector;
 use crate::ui::Component;
@@ -7,15 +7,15 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
 use ratatui::widgets::{List, ListItem, ListState};
 use ratatui::Frame;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct SettingsPage {
     selector: Selector,
-    settings: Arc<models::Settings>,
+    settings: Rc<Settings>,
 }
 
 impl SettingsPage {
-    pub fn new(settings: Arc<models::Settings>) -> Self {
+    pub fn new(settings: Rc<Settings>) -> Self {
         Self {
             selector: Selector::new(3),
             settings,

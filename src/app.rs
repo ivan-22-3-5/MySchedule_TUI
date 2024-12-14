@@ -9,13 +9,13 @@ use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::Rect;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use std::rc::Rc;
 use tokio::sync::mpsc;
 use tracing::{debug, info};
 
 pub struct App {
-    schedule: Arc<Schedule>,
-    settings: Arc<Settings>,
+    schedule: Rc<Schedule>,
+    settings: Rc<Settings>,
     config: Config,
     tick_rate: f64,
     frame_rate: f64,
@@ -38,22 +38,22 @@ pub enum Mode {
 impl App {
     pub fn new(tick_rate: f64, frame_rate: f64) -> Result<Self> {
         let (action_tx, action_rx) = mpsc::unbounded_channel();
-        let schedule: Arc<Schedule> = Arc::new(match std::fs::File::open("files/schedule.json") {
+        let schedule: Rc<Schedule> = Rc::new(match std::fs::File::open("files/schedule.json") {
             Ok(file) => serde_json::from_reader(file)?,
             Err(_) => Schedule::new(),
         });
-        let settings: Arc<Settings> = Arc::new(match std::fs::File::open("files/settings.json") {
+        let settings: Rc<Settings> = Rc::new(match std::fs::File::open("files/settings.json") {
             Ok(file) => serde_json::from_reader(file)?,
             Err(_) => Settings::default(),
         });
         Ok(Self {
             tick_rate,
             frame_rate,
-            schedule: Arc::clone(&schedule),
-            settings: Arc::clone(&settings),
+            schedule: Rc::clone(&schedule),
+            settings: Rc::clone(&settings),
             components: vec![Box::new(Home::new(
-                Arc::clone(&schedule),
-                Arc::clone(&settings),
+                Rc::clone(&schedule),
+                Rc::clone(&settings),
             ))],
             should_quit: false,
             should_suspend: false,

@@ -11,6 +11,7 @@ pub struct Conference {
     pub week: u8,
 }
 
+#[allow(dead_code)]
 impl Conference {
     pub fn open(&self) {
         webbrowser::open(&self.link).expect("Browser failed to open");

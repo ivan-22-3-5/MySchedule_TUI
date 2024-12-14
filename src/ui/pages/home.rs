@@ -1,13 +1,14 @@
 use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
-use std::sync::Arc;
+use std::rc::Rc;
 use tokio::sync::mpsc::UnboundedSender;
 
+use crate::models::{Schedule, Settings};
 use crate::ui::components::FpsCounter;
 use crate::ui::pages::{SchedulePage, SettingsPage};
 use crate::ui::Component;
-use crate::{action::Action, config::Config, models};
+use crate::{action::Action, config::Config};
 
 pub struct Home {
     schedule: SchedulePage,
@@ -26,7 +27,7 @@ enum ActivePage {
 }
 
 impl Home {
-    pub fn new(schedule: Arc<models::Schedule>, settings: Arc<models::Settings>) -> Self {
+    pub fn new(schedule: Rc<Schedule>, settings: Rc<Settings>) -> Self {
         Self {
             schedule: SchedulePage::new(schedule),
             settings: SettingsPage::new(settings),
