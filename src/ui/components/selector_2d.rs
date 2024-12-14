@@ -37,7 +37,7 @@ impl Selector2D {
                 _ => self.selected_row - 1,
             };
             if self.selected_col >= self.row_lengths[self.selected_row] {
-                self.selected_col = self.row_lengths[self.selected_row] - 1;
+                self.selected_col = self.row_lengths[self.selected_row].saturating_sub(1);
             }
         }
     }
@@ -47,7 +47,7 @@ impl Selector2D {
         if length > 1 {
             self.selected_row = (self.selected_row + 1) % length;
             if self.selected_col >= self.row_lengths[self.selected_row] {
-                self.selected_col = self.row_lengths[self.selected_row] - 1;
+                self.selected_col = self.row_lengths[self.selected_row].saturating_sub(1);
             }
         }
     }
