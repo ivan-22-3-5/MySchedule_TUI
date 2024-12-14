@@ -28,7 +28,8 @@ pub struct TimeInputField {
 
 impl InputField for TimeInputField {
     fn get_value(&self) -> String {
-        format!("{:02}:{:02}", self.hours.value(), self.minutes.value())
+        let (hours, minutes) = self.get_parsed_input();
+        format!("{:02}:{:02}", hours, minutes)
     }
     fn borders(&mut self, border_style: Option<BorderStyle>) {
         self.border_style = border_style;
@@ -48,6 +49,20 @@ impl TimeInputField {
             selected_field: SelectedField::default(),
             title: title.unwrap_or_default(),
         }
+    }
+
+    fn get_parsed_input(&self) -> (u8, u8) {
+        let hours: u8 = self
+            .hours
+            .value()
+            .parse()
+            .expect("IntInputHandler should always give valid number");
+        let minutes: u8 = self
+            .minutes
+            .value()
+            .parse()
+            .expect("IntInputHandler should always give valid number");
+        (hours, minutes)
     }
 }
 
@@ -88,17 +103,7 @@ impl Component for TimeInputField {
         ])
         .areas(area);
 
-        let hours: u8 = self
-            .hours
-            .value()
-            .parse()
-            .expect("IntInputHandler should always give valid number");
-        let minutes: u8 = self
-            .minutes
-            .value()
-            .parse()
-            .expect("IntInputHandler should always give valid number");
-
+        let (hours, minutes) = self.get_parsed_input();
         let mut minutes = Span::raw(format!("{:02}", minutes));
         let mut hours = Span::raw(format!("{:02}", hours));
         if self.is_cursor_visible {
