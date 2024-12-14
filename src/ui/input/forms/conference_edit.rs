@@ -35,9 +35,14 @@ impl ConferenceEditForm {
                 .with_active_field_style(THEME.active_field),
         )
     }
-    delegate! {
-        to self.0 {
-            pub fn get_input(&self) -> Vec<Vec<String>>;
+
+    pub fn get_conference(&self) -> Conference {
+        let input = self.0.get_input();
+        Conference {
+            title: input[0][0].clone(),
+            start_time: input[0][1].clone(),
+            link: input[1][0].clone(),
+            ..Default::default()
         }
     }
 }
