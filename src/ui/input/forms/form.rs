@@ -36,6 +36,13 @@ impl Form {
         }
     }
 
+    pub fn get_input(&self) -> Vec<Vec<String>> {
+        self.layout
+            .iter()
+            .map(|row| row.iter().map(|field| field.get_value()).collect())
+            .collect()
+    }
+
     //region style setters
     pub fn with_field_style(mut self, style: Style) -> Self {
         self.field_style = style;

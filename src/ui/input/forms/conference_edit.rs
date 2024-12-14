@@ -35,6 +35,11 @@ impl ConferenceEditForm {
                 .with_active_field_style(THEME.active_field),
         )
     }
+    delegate! {
+        to self.0 {
+            pub fn get_input(&self) -> Vec<Vec<String>>;
+        }
+    }
 }
 
 impl Component for ConferenceEditForm {
