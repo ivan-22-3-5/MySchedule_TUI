@@ -1,16 +1,23 @@
 {
   "keybindings": {
     "Schedule": {
-      "<q>": "Quit",
+      "<Ctrl-q>": "Quit",
       "<Ctrl-c>": "Quit",
       "<Ctrl-z>": "Suspend",
-      "<esc>": "Settings"
+      "<esc>": {
+        "ChangeMode": "Settings"
+      }
     },
     "Settings": {
-      "<q>": "Quit",
+      "<Ctrl-q>": "Quit",
       "<Ctrl-c>": "Quit",
       "<Ctrl-z>": "Suspend",
-      "<esc>": "Schedule"
+      "<esc>": {
+        "ChangeMode": "Schedule"
+      },
+    },
+    "Edit": {
+      "<Ctrl-q>": "Quit",
     }
   }
 }

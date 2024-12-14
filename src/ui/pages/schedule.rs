@@ -1,4 +1,4 @@
-use crate::action::Action;
+use crate::action::{Action, Mode as AppMode};
 use crate::models::Schedule;
 use crate::theme::THEME;
 use crate::ui::components::Selector2D;
@@ -62,47 +62,68 @@ impl SchedulePage {
         let mut state = ListState::default().with_selected(Option::from(selected_conference));
         frame.render_stateful_widget(list, area, &mut state);
     }
+
+    fn handle_view_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
+        match key.code {
+            KeyCode::Up => {
+                self.selector.move_left();
+                Ok(None)
+            }
+            KeyCode::Down => {
+                self.selector.move_right();
+                Ok(None)
+            }
+            KeyCode::Left => {
+                self.selector.move_up();
+                Ok(None)
+            }
+            KeyCode::Right => {
+                self.selector.move_down();
+                Ok(None)
+            }
+            KeyCode::Char('e') => {
+                let (day, conf) = self.selector.selected();
+                self.mode = Mode::Edit(ConferenceEditForm::new(
+                    self.schedule
+                        .to_array()
+                        .get(day)
+                        .unwrap()
+                        .get(conf)
+                        .unwrap()
+                        .clone(),
+                ));
+                Ok(Some(Action::ChangeMode(AppMode::Edit)))
+            }
+            _ => Ok(None),
+        }
+    }
 }
 
 impl Component for SchedulePage {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         match &mut self.mode {
-            Mode::View => match key.code {
-                KeyCode::Up => self.selector.move_left(),
-                KeyCode::Down => self.selector.move_right(),
-                KeyCode::Left => self.selector.move_up(),
-                KeyCode::Right => self.selector.move_down(),
-                KeyCode::Char('e') => {
-                    let (day, conf) = self.selector.selected();
-                    self.mode = Mode::Edit(ConferenceEditForm::new(
-                        self.schedule
-                            .to_array()
-                            .get(day)
-                            .unwrap()
-                            .get(conf)
-                            .unwrap()
-                            .clone(),
-                    ))
-                }
-                _ => (),
-            },
-            Mode::Edit(form) => {
-                form.handle_key_event(key)?;
-                if key.code == KeyCode::Esc {
-                    // let (day, conf) = self.selector.selected();
-
+            Mode::View => Ok(self.handle_view_key_event(key)?),
+            Mode::Edit(form) => match key.code {
+                KeyCode::Esc => {
                     self.mode = Mode::View;
+                    Ok(Some(Action::ChangeMode(AppMode::Schedule)))
                 }
-            }
+                _ => Ok(form.handle_key_event(key)?),
+            },
         }
-        Ok(None)
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let layout: [Rect; 2] =
-            Layout::vertical([Constraint::Percentage(15), Constraint::Percentage(85)]).areas(area);
-        self.render_days(frame, layout[0]);
-        self.render_conferences(frame, layout[1]);
+        match &mut self.mode {
+            Mode::View => {
+                let layout: [Rect; 2] =
+                    Layout::vertical([Constraint::Percentage(15), Constraint::Percentage(85)])
+                        .areas(area);
+                self.render_days(frame, layout[0]);
+                self.render_conferences(frame, layout[1]);
+            }
+            Mode::Edit(form) => form.draw(frame, area)?,
+        }
         Ok(())
     }
 }

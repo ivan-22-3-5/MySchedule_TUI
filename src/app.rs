@@ -1,3 +1,4 @@
+use crate::action::Mode;
 use crate::{
     action::Action,
     config::Config,
@@ -8,7 +9,6 @@ use crate::{
 use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::Rect;
-use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 use tokio::sync::mpsc;
 use tracing::{debug, info};
@@ -26,13 +26,6 @@ pub struct App {
     last_tick_key_events: Vec<KeyEvent>,
     action_tx: mpsc::UnboundedSender<Action>,
     action_rx: mpsc::UnboundedReceiver<Action>,
-}
-
-#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum Mode {
-    #[default]
-    Schedule,
-    Settings,
 }
 
 impl App {
@@ -154,7 +147,7 @@ impl App {
             if action != Action::Tick && action != Action::Render {
                 debug!("{action:?}");
             }
-            match action {
+            match action.clone() {
                 Action::Tick => {
                     self.last_tick_key_events.drain(..);
                 }
@@ -164,8 +157,7 @@ impl App {
                 Action::ClearScreen => tui.terminal.clear()?,
                 Action::Resize(w, h) => self.handle_resize(tui, w, h)?,
                 Action::Render => self.render(tui)?,
-                Action::Schedule => self.mode = Mode::Schedule,
-                Action::Settings => self.mode = Mode::Settings,
+                Action::ChangeMode(mode) => self.mode = mode,
                 _ => {}
             }
             for component in self.components.iter_mut() {

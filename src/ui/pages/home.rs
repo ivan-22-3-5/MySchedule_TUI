@@ -4,6 +4,7 @@ use ratatui::prelude::*;
 use std::rc::Rc;
 use tokio::sync::mpsc::UnboundedSender;
 
+use crate::action::Mode;
 use crate::models::{Schedule, Settings};
 use crate::ui::components::FpsCounter;
 use crate::ui::pages::{SchedulePage, SettingsPage};
@@ -52,20 +53,25 @@ impl Component for Home {
 
     fn handle_key_event(&mut self, key: KeyEvent) -> Result<Option<Action>> {
         match self.active_page {
-            ActivePage::Settings => self.settings.handle_key_event(key)?,
-            ActivePage::Schedule => self.schedule.handle_key_event(key)?,
-        };
-        Ok(None)
+            ActivePage::Settings => Ok(self.settings.handle_key_event(key)?),
+            ActivePage::Schedule => Ok(self.schedule.handle_key_event(key)?),
+        }
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>> {
         self.fps.update(action.clone())?;
         self.schedule.update(action.clone())?;
         self.settings.update(action.clone())?;
-        match action {
-            Action::Settings => self.active_page = ActivePage::Settings,
-            Action::Schedule => self.active_page = ActivePage::Schedule,
-            _ => {}
+        if let Action::ChangeMode(mode) = action {
+            match mode {
+                Mode::Settings => {
+                    self.active_page = ActivePage::Settings;
+                }
+                Mode::Schedule => {
+                    self.active_page = ActivePage::Schedule;
+                }
+                _ => {}
+            }
         }
         Ok(None)
     }
