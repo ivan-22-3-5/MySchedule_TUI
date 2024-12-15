@@ -20,7 +20,10 @@ impl ConferenceEditForm {
                     50,
                     Some(conference.title),
                 )),
-                Box::new(TimeInputField::new(Some("Start Time".into()))),
+                Box::new(TimeInputField::new(
+                    Some("Start Time".into()),
+                    Some(conference.start_time.parse().unwrap()),
+                )),
             ],
             vec![Box::new(StrInputField::new(
                 Some("Link".into()),

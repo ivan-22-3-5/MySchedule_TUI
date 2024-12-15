@@ -9,6 +9,69 @@ use ratatui::prelude::Style;
 use ratatui::text::Span;
 use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
+use std::str::FromStr;
+
+#[derive(Clone)]
+pub struct TimeStr(String);
+
+impl TimeStr {
+    pub fn parse(time: &str) -> Result<TimeStr, &'static str> {
+        const MAX_HOURS: u8 = 23;
+        const MAX_MINUTES: u8 = 59;
+
+        fn validate_hours(hours: u8) -> Result<(), &'static str> {
+            if hours <= MAX_HOURS {
+                Ok(())
+            } else {
+                Err("Invalid hour: must be between 0 and 23")
+            }
+        }
+
+        fn validate_minutes(minutes: u8) -> Result<(), &'static str> {
+            if minutes <= MAX_MINUTES {
+                Ok(())
+            } else {
+                Err("Invalid minute: must be between 0 and 59")
+            }
+        }
+
+        let mut parts = time.split(':').map(|s| s.parse::<u8>());
+        match (parts.next(), parts.next()) {
+            (Some(Ok(hours)), Some(Ok(minutes))) => {
+                validate_hours(hours)?;
+                validate_minutes(minutes)?;
+                Ok(Self(time.to_string()))
+            }
+            _ => Err("Invalid time format: must be HH:MM"),
+        }
+    }
+
+    pub fn hours(&self) -> u32 {
+        self.0
+            .split(':')
+            .next()
+            .unwrap()
+            .parse()
+            .expect("TimeStr should always have valid hours")
+    }
+
+    pub fn minutes(&self) -> u32 {
+        self.0
+            .split(':')
+            .nth(1)
+            .unwrap()
+            .parse()
+            .expect("TimeStr should always have valid minutes")
+    }
+}
+
+impl FromStr for TimeStr {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TimeStr::parse(s)
+    }
+}
 
 #[derive(Default)]
 enum SelectedField {
@@ -40,10 +103,10 @@ impl InputField for TimeInputField {
 }
 #[allow(dead_code)]
 impl TimeInputField {
-    pub fn new(title: Option<String>) -> Self {
+    pub fn new(title: Option<String>, initial_time: Option<TimeStr>) -> Self {
         Self {
-            hours: IntInputHandler::new(None, 23),
-            minutes: IntInputHandler::new(None, 59),
+            hours: IntInputHandler::new(initial_time.clone().map(|time| time.hours()), 23),
+            minutes: IntInputHandler::new(initial_time.map(|time| time.minutes()), 59),
             border_style: Some((Borders::ALL, Style::default())),
             is_cursor_visible: false,
             selected_field: SelectedField::default(),
