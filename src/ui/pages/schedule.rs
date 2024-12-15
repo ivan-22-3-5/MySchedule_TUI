@@ -27,12 +27,7 @@ pub struct SchedulePage {
 
 impl SchedulePage {
     pub fn new(schedule: Rc<RefCell<Schedule>>) -> Self {
-        let day_lengths = schedule
-            .borrow()
-            .as_array()
-            .iter()
-            .map(|day| day.len())
-            .collect();
+        let day_lengths = schedule.borrow().iter().map(|day| day.len()).collect();
         Self {
             selector: Selector2D::new(day_lengths),
             schedule,
@@ -57,12 +52,7 @@ impl SchedulePage {
 
     fn render_conferences(&mut self, frame: &mut Frame, area: Rect) {
         let (selected_day, selected_conference) = self.selector.selected();
-        let titles: Vec<String> = self
-            .schedule
-            .borrow()
-            .as_array()
-            .get(selected_day)
-            .unwrap()
+        let titles: Vec<String> = self.schedule.borrow()[selected_day]
             .iter()
             .map(|c| c.title.clone())
             .collect();
@@ -93,14 +83,7 @@ impl SchedulePage {
             KeyCode::Char('e') => {
                 let (day, conf) = self.selector.selected();
                 self.mode = Mode::Edit(ConferenceEditForm::new(
-                    self.schedule
-                        .borrow()
-                        .as_array()
-                        .get(day)
-                        .unwrap()
-                        .get(conf)
-                        .unwrap()
-                        .clone(),
+                    self.schedule.borrow()[day][conf].clone(),
                 ));
                 Ok(Some(Action::ChangeMode(AppMode::Edit)))
             }
@@ -115,6 +98,8 @@ impl Component for SchedulePage {
             Mode::View => Ok(self.handle_view_key_event(key)?),
             Mode::Edit(form) => match key.code {
                 KeyCode::Esc => {
+                    let (day, conf) = self.selector.selected();
+                    self.schedule.borrow_mut()[day][conf] = form.get_conference();
                     self.mode = Mode::View;
                     Ok(Some(Action::ChangeMode(AppMode::Schedule)))
                 }

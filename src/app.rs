@@ -35,7 +35,7 @@ impl App {
         let schedule: Rc<RefCell<Schedule>> = Rc::new(RefCell::new(
             match std::fs::File::open("files/schedule.json") {
                 Ok(file) => serde_json::from_reader(file)?,
-                Err(_) => Schedule::new(),
+                Err(_) => Schedule::default(),
             },
         ));
         let settings: Rc<RefCell<Settings>> = Rc::new(RefCell::new(
