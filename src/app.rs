@@ -9,13 +9,14 @@ use crate::{
 use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::Rect;
+use std::cell::RefCell;
 use std::rc::Rc;
 use tokio::sync::mpsc;
 use tracing::{debug, info};
 
 pub struct App {
-    schedule: Rc<Schedule>,
-    settings: Rc<Settings>,
+    schedule: Rc<RefCell<Schedule>>,
+    settings: Rc<RefCell<Settings>>,
     config: Config,
     tick_rate: f64,
     frame_rate: f64,
@@ -31,14 +32,18 @@ pub struct App {
 impl App {
     pub fn new(tick_rate: f64, frame_rate: f64) -> Result<Self> {
         let (action_tx, action_rx) = mpsc::unbounded_channel();
-        let schedule: Rc<Schedule> = Rc::new(match std::fs::File::open("files/schedule.json") {
-            Ok(file) => serde_json::from_reader(file)?,
-            Err(_) => Schedule::new(),
-        });
-        let settings: Rc<Settings> = Rc::new(match std::fs::File::open("files/settings.json") {
-            Ok(file) => serde_json::from_reader(file)?,
-            Err(_) => Settings::default(),
-        });
+        let schedule: Rc<RefCell<Schedule>> = Rc::new(RefCell::new(
+            match std::fs::File::open("files/schedule.json") {
+                Ok(file) => serde_json::from_reader(file)?,
+                Err(_) => Schedule::new(),
+            },
+        ));
+        let settings: Rc<RefCell<Settings>> = Rc::new(RefCell::new(
+            match std::fs::File::open("files/settings.json") {
+                Ok(file) => serde_json::from_reader(file)?,
+                Err(_) => Settings::default(),
+            },
+        ));
         Ok(Self {
             tick_rate,
             frame_rate,

@@ -9,7 +9,7 @@ impl Schedule {
         Schedule::default()
     }
 
-    pub fn to_array(&self) -> &[Vec<Conference>; 7] {
+    pub fn as_array(&self) -> &[Vec<Conference>; 7] {
         &self.0
     }
 }

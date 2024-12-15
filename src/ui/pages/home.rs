@@ -1,6 +1,7 @@
 use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
+use std::cell::RefCell;
 use std::rc::Rc;
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -28,7 +29,7 @@ enum ActivePage {
 }
 
 impl Home {
-    pub fn new(schedule: Rc<Schedule>, settings: Rc<Settings>) -> Self {
+    pub fn new(schedule: Rc<RefCell<Schedule>>, settings: Rc<RefCell<Settings>>) -> Self {
         Self {
             schedule: SchedulePage::new(schedule),
             settings: SettingsPage::new(settings),

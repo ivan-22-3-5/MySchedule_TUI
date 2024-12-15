@@ -9,6 +9,7 @@ use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::prelude::{Color, Style};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Tabs};
 use ratatui::Frame;
+use std::cell::RefCell;
 use std::rc::Rc;
 
 #[derive(Default)]
@@ -19,15 +20,21 @@ enum Mode {
 }
 
 pub struct SchedulePage {
-    schedule: Rc<Schedule>,
+    schedule: Rc<RefCell<Schedule>>,
     selector: Selector2D,
     mode: Mode,
 }
 
 impl SchedulePage {
-    pub fn new(schedule: Rc<Schedule>) -> Self {
+    pub fn new(schedule: Rc<RefCell<Schedule>>) -> Self {
+        let day_lengths = schedule
+            .borrow()
+            .as_array()
+            .iter()
+            .map(|day| day.len())
+            .collect();
         Self {
-            selector: Selector2D::new(schedule.to_array().iter().map(|day| day.len()).collect()),
+            selector: Selector2D::new(day_lengths),
             schedule,
             mode: Mode::default(),
         }
@@ -50,14 +57,16 @@ impl SchedulePage {
 
     fn render_conferences(&mut self, frame: &mut Frame, area: Rect) {
         let (selected_day, selected_conference) = self.selector.selected();
-        let titles = self
+        let titles: Vec<String> = self
             .schedule
-            .to_array()
+            .borrow()
+            .as_array()
             .get(selected_day)
             .unwrap()
             .iter()
-            .map(|c| c.title.clone());
-        let items = titles.map(ListItem::new);
+            .map(|c| c.title.clone())
+            .collect();
+        let items = titles.into_iter().map(ListItem::new);
         let list = List::new(items).highlight_style(THEME.selected_text);
         let mut state = ListState::default().with_selected(Option::from(selected_conference));
         frame.render_stateful_widget(list, area, &mut state);
@@ -85,7 +94,8 @@ impl SchedulePage {
                 let (day, conf) = self.selector.selected();
                 self.mode = Mode::Edit(ConferenceEditForm::new(
                     self.schedule
-                        .to_array()
+                        .borrow()
+                        .as_array()
                         .get(day)
                         .unwrap()
                         .get(conf)
