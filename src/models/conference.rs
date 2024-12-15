@@ -1,10 +1,11 @@
+use crate::models::Time;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Conference {
     pub title: String,
     pub link: String,
-    pub start_time: String,
+    pub start_time: Time,
     pub duration: u8,
     pub password: Option<String>,
     pub autostart_permission: bool,

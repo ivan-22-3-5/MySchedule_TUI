@@ -22,7 +22,7 @@ impl ConferenceEditForm {
                 )),
                 Box::new(TimeInputField::new(
                     Some("Start Time".into()),
-                    Some(conference.start_time.parse().unwrap()),
+                    Some(conference.start_time),
                 )),
             ],
             vec![Box::new(StrInputField::new(
@@ -43,7 +43,9 @@ impl ConferenceEditForm {
         let input = self.0.get_input();
         Conference {
             title: input[0][0].clone(),
-            start_time: input[0][1].clone(),
+            start_time: input[0][1]
+                .parse()
+                .expect("TimeInputField should give valid time"),
             link: input[1][0].clone(),
             ..Default::default()
         }
