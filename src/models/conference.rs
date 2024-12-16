@@ -6,7 +6,7 @@ pub struct Conference {
     pub title: String,
     pub link: String,
     pub start_time: Time,
-    pub duration: u8,
+    pub end_time: Time,
     pub password: Option<String>,
     pub autostart_permission: bool,
     pub week: u8,
