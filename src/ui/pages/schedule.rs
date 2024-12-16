@@ -46,7 +46,6 @@ impl SchedulePage {
             .padding("", "")
             .highlight_style(THEME.selected_text)
             .select(selected_day);
-
         frame.render_widget(tabs, area);
     }
 
@@ -102,8 +101,7 @@ impl Component for SchedulePage {
         match &mut self.mode {
             Mode::View => {
                 let layout: [Rect; 2] =
-                    Layout::vertical([Constraint::Percentage(15), Constraint::Percentage(85)])
-                        .areas(area);
+                    Layout::vertical([Constraint::Length(3), Constraint::Min(0)]).areas(area);
                 self.render_days(frame, layout[0]);
                 self.render_conferences(frame, layout[1]);
             }
