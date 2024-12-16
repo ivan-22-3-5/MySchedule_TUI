@@ -12,7 +12,7 @@ impl InputField for StrInputField {
     delegate! {
         to self.0 {
             fn get_value(&self) -> String;
-            fn borders(&mut self, border_style: Option<BorderStyle>);
+            fn borders(&mut self, border_style: BorderStyle);
             fn set_cursor_visibility(&mut self, visible: bool);
         }
     }

@@ -23,7 +23,7 @@ pub struct TimeInputField {
     minutes: IntInputHandler,
     title: String,
     selected_field: SelectedField,
-    border_style: Option<BorderStyle>,
+    border_style: BorderStyle,
     is_cursor_visible: bool,
 }
 
@@ -32,7 +32,7 @@ impl InputField for TimeInputField {
         let (hours, minutes) = self.get_parsed_input();
         format!("{:02}:{:02}", hours, minutes)
     }
-    fn borders(&mut self, border_style: Option<BorderStyle>) {
+    fn borders(&mut self, border_style: BorderStyle) {
         self.border_style = border_style;
     }
     fn set_cursor_visibility(&mut self, visible: bool) {
@@ -48,7 +48,7 @@ impl TimeInputField {
                 initial_time.as_ref().map(|time| time.minutes() as u32),
                 59,
             ),
-            border_style: Some((Borders::ALL, Style::default())),
+            border_style: (Borders::ALL, Style::default()),
             is_cursor_visible: false,
             selected_field: SelectedField::default(),
             title: title.unwrap_or_default(),
@@ -88,16 +88,16 @@ impl Component for TimeInputField {
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let mut width = area.width;
         width -= (width + 1) % 2;
+
         let area = Layout::horizontal([Constraint::Length(width)]).split(area)[0];
-        let mut area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
-        if let Some(bs) = self.border_style {
-            let block = Block::default()
-                .title(self.title.clone())
-                .borders(bs.0)
-                .border_style(bs.1);
-            frame.render_widget(block.clone(), area);
-            area = block.inner(area);
-        }
+        let area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
+
+        let block = Block::default()
+            .title(self.title.clone())
+            .borders(self.border_style.0)
+            .border_style(self.border_style.1);
+        frame.render_widget(block.clone(), area);
+
         let [_, hours_area, colon_area, minutes_area, _] = Layout::horizontal([
             Constraint::Fill(1),
             Constraint::Length(2),
@@ -105,7 +105,7 @@ impl Component for TimeInputField {
             Constraint::Length(2),
             Constraint::Fill(1),
         ])
-        .areas(area);
+        .areas(block.inner(area));
 
         let (hours, minutes) = self.get_parsed_input();
         let mut minutes = Span::raw(format!("{:02}", minutes));

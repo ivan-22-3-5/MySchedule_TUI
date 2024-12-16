@@ -62,8 +62,7 @@ impl Form {
 
     fn handle_field_selection(&mut self, key: KeyEvent) {
         let field_style = self.field_style;
-        self.selected_field()
-            .borders(Some((Borders::ALL, field_style)));
+        self.selected_field().borders((Borders::ALL, field_style));
         match key.code {
             KeyCode::Up => self.selector.move_up(),
             KeyCode::Down => self.selector.move_down(),
@@ -73,7 +72,7 @@ impl Form {
         }
         let selected_field_style = self.selected_field_style;
         self.selected_field()
-            .borders(Some((Borders::ALL, selected_field_style)))
+            .borders((Borders::ALL, selected_field_style))
     }
 
     fn propagate_key(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
@@ -90,8 +89,7 @@ impl Form {
 
     fn build_layout(&self, area: Rect) -> Vec<Vec<Rect>> {
         let length = self.layout.len();
-        let outer_layout =
-            Layout::vertical((0..length).map(|_| Constraint::Ratio(1, length as u32))).split(area);
+        let outer_layout = Layout::vertical((0..length).map(|_| Constraint::Length(3))).split(area);
 
         self.layout
             .iter()
@@ -113,7 +111,7 @@ impl Component for Form {
                     self.is_selected_field_active = false;
                     let selected_field_style = self.selected_field_style;
                     self.selected_field()
-                        .borders(Some((Borders::ALL, selected_field_style)));
+                        .borders((Borders::ALL, selected_field_style));
                     self.selected_field().set_cursor_visibility(false);
                 }
                 _ => {
@@ -126,7 +124,7 @@ impl Component for Form {
                     self.is_selected_field_active = true;
                     let active_field_style = self.active_field_style;
                     self.selected_field()
-                        .borders(Some((Borders::ALL, active_field_style)));
+                        .borders((Borders::ALL, active_field_style));
                     self.selected_field().set_cursor_visibility(true);
                 }
                 _ => {

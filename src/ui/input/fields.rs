@@ -20,14 +20,14 @@ type BorderStyle = (Borders, Style);
 #[allow(dead_code)]
 pub trait InputField: Component {
     fn get_value(&self) -> String;
-    fn borders(&mut self, border_style: Option<BorderStyle>);
+    fn borders(&mut self, border_style: BorderStyle);
     fn set_cursor_visibility(&mut self, visible: bool);
 }
 
 pub struct BaseInputField {
     title: String,
     is_cursor_visible: bool,
-    border_style: Option<BorderStyle>,
+    border_style: BorderStyle,
     input_handler: Box<dyn InputHandler>,
     left_padding: u16,
 }
@@ -37,7 +37,7 @@ impl InputField for BaseInputField {
         self.input_handler.value()
     }
 
-    fn borders(&mut self, border_style: Option<BorderStyle>) {
+    fn borders(&mut self, border_style: BorderStyle) {
         self.border_style = border_style;
     }
 
@@ -51,7 +51,7 @@ impl BaseInputField {
     pub fn new(title: Option<String>, input_handler: Box<dyn InputHandler>) -> Self {
         Self {
             title: title.unwrap_or_default(),
-            border_style: Some((Borders::ALL, Style::default())),
+            border_style: (Borders::ALL, Style::default()),
             is_cursor_visible: false,
             input_handler,
             left_padding: 0,
@@ -81,22 +81,14 @@ impl Component for BaseInputField {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
-        let mut area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
-        if let Some(bs) = self.border_style {
-            let block = Block::default()
-                .borders(bs.0)
-                .border_style(bs.1)
-                .title(self.title.clone());
-            frame.render_widget(block.clone(), area);
-            area = block.inner(area);
-        }
+        let area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
 
         self.recalculate_padding(area.width - 1);
 
         if self.is_cursor_visible {
             frame.set_cursor_position((
                 area.x + self.input_handler.cursor_position() as u16 - self.left_padding,
-                area.y,
+                area.y + 1,
             ));
         }
 
@@ -107,7 +99,13 @@ impl Component for BaseInputField {
             .skip(self.left_padding as usize)
             .take(area.width as usize)
             .collect();
-        frame.render_widget(Line::from(string_slice_to_show), area);
+
+        let block = Block::default()
+            .borders(self.border_style.0)
+            .border_style(self.border_style.1)
+            .title(self.title.clone());
+        frame.render_widget(block.clone(), area);
+        frame.render_widget(Line::from(string_slice_to_show), block.inner(area));
         Ok(())
     }
 }
