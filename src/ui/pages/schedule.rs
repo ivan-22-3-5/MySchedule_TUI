@@ -63,32 +63,22 @@ impl SchedulePage {
     }
 
     fn handle_view_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        match key.code {
-            KeyCode::Up => {
-                self.selector.move_left();
-                Ok(None)
-            }
-            KeyCode::Down => {
-                self.selector.move_right();
-                Ok(None)
-            }
-            KeyCode::Left => {
-                self.selector.move_up();
-                Ok(None)
-            }
-            KeyCode::Right => {
-                self.selector.move_down();
-                Ok(None)
-            }
-            KeyCode::Char('e') => {
-                let (day, conf) = self.selector.selected();
-                self.mode = Mode::Edit(ConferenceEditForm::new(
-                    self.schedule.borrow()[day][conf].clone(),
-                ));
-                Ok(Some(Action::ChangeMode(AppMode::Edit)))
-            }
-            _ => Ok(None),
+        if key.code == KeyCode::Char('e') {
+            let (day, conf) = self.selector.selected();
+            self.mode = Mode::Edit(ConferenceEditForm::new(
+                self.schedule.borrow()[day][conf].clone(),
+            ));
+            return Ok(Some(Action::ChangeMode(AppMode::Edit)));
+        } else {
+            match key.code {
+                KeyCode::Up => self.selector.move_left(),
+                KeyCode::Down => self.selector.move_right(),
+                KeyCode::Left => self.selector.move_up(),
+                KeyCode::Right => self.selector.move_down(),
+                _ => (),
+            };
         }
+        Ok(None)
     }
 }
 
