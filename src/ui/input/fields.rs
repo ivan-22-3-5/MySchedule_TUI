@@ -83,11 +83,11 @@ impl Component for BaseInputField {
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> color_eyre::Result<()> {
         let area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
 
-        self.recalculate_padding(area.width - 1);
+        self.recalculate_padding(area.width - 3);
 
         if self.is_cursor_visible {
             frame.set_cursor_position((
-                area.x + self.input_handler.cursor_position() as u16 - self.left_padding,
+                area.x + 1 + self.input_handler.cursor_position() as u16 - self.left_padding,
                 area.y + 1,
             ));
         }
