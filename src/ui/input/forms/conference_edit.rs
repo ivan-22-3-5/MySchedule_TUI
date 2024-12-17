@@ -13,23 +13,47 @@ pub struct ConferenceEditForm(Form);
 #[allow(dead_code)]
 impl ConferenceEditForm {
     pub fn new(conference: Conference) -> Self {
-        let field_layout: Vec<Vec<Box<dyn InputField>>> = vec![
-            vec![
+        let field_layout: Vec<Vec<(Box<dyn InputField>, u16)>> = vec![
+            vec![(
                 Box::new(StrInputField::new(
                     Some("Title".into()),
                     50,
                     Some(conference.title),
                 )),
-                Box::new(TimeInputField::new(
-                    Some("Start Time".into()),
-                    Some(conference.start_time),
-                )),
-            ],
-            vec![Box::new(StrInputField::new(
-                Some("Link".into()),
                 50,
-                Some(conference.link),
-            ))],
+            )],
+            vec![
+                (
+                    Box::new(TimeInputField::new(
+                        Some("Start Time".into()),
+                        Some(conference.start_time),
+                    )),
+                    25,
+                ),
+                (
+                    Box::new(TimeInputField::new(
+                        Some("End Time".into()),
+                        Some(conference.end_time),
+                    )),
+                    25,
+                ),
+            ],
+            vec![(
+                Box::new(StrInputField::new(
+                    Some("Link".into()),
+                    50,
+                    Some(conference.link),
+                )),
+                50,
+            )],
+            vec![(
+                Box::new(StrInputField::new(
+                    Some("Password".into()),
+                    50,
+                    Some(conference.password.unwrap_or_default()),
+                )),
+                50,
+            )],
         ];
         Self(
             Form::new(field_layout)
@@ -43,10 +67,14 @@ impl ConferenceEditForm {
         let input = self.0.get_input();
         Conference {
             title: input[0][0].clone(),
-            start_time: input[0][1]
+            start_time: input[1][0]
                 .parse()
                 .expect("TimeInputField should give valid time"),
-            link: input[1][0].clone(),
+            end_time: input[1][1]
+                .parse()
+                .expect("TimeInputField should give valid time"),
+            link: input[2][0].clone(),
+            password: (!input[3][0].is_empty()).then_some(input[3][0].clone()),
             ..Default::default()
         }
     }

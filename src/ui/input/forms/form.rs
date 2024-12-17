@@ -9,7 +9,7 @@ use ratatui::widgets::Borders;
 pub struct Form {
     is_selected_field_active: bool,
     selector: Selector2D,
-    layout: Vec<Vec<Box<dyn InputField>>>,
+    layout: Vec<Vec<(Box<dyn InputField>, u16)>>,
     field_style: Style,
     selected_field_style: Style,
     active_field_style: Style,
@@ -20,9 +20,9 @@ impl Form {
     pub fn new<O, I>(layout: O) -> Self
     where
         O: IntoIterator<Item = I>,
-        I: IntoIterator<Item = Box<dyn InputField>>,
+        I: IntoIterator<Item = (Box<dyn InputField>, u16)>,
     {
-        let layout: Vec<Vec<Box<dyn InputField>>> = layout
+        let layout: Vec<Vec<(Box<dyn InputField>, u16)>> = layout
             .into_iter()
             .map(|row| row.into_iter().collect())
             .collect();
@@ -39,7 +39,7 @@ impl Form {
     pub fn get_input(&self) -> Vec<Vec<String>> {
         self.layout
             .iter()
-            .map(|row| row.iter().map(|field| field.get_value()).collect())
+            .map(|row| row.iter().map(|(field, _)| field.get_value()).collect())
             .collect()
     }
 
@@ -84,7 +84,7 @@ impl Form {
 
     fn selected_field(&mut self) -> &mut Box<dyn InputField> {
         let (row, col) = self.selector.selected();
-        &mut self.layout[row][col]
+        &mut self.layout[row][col].0
     }
 
     fn build_layout(&self, area: Rect) -> Vec<Vec<Rect>> {
@@ -95,7 +95,7 @@ impl Form {
             .iter()
             .enumerate()
             .map(|(index, row)| {
-                Layout::horizontal((0..row.len()).map(|_| Constraint::Ratio(1, row.len() as u32)))
+                Layout::horizontal(row.iter().map(|(_, width)| Constraint::Length(*width)))
                     .split(outer_layout[index])
                     .to_vec()
             })
@@ -146,7 +146,7 @@ impl Component for Form {
         let layout = self.build_layout(area);
 
         for (row_index, row) in self.layout.iter_mut().enumerate() {
-            for (col_index, field) in row.iter_mut().enumerate() {
+            for (col_index, (field, _)) in row.iter_mut().enumerate() {
                 field.draw(frame, layout[row_index][col_index])?;
             }
         }
