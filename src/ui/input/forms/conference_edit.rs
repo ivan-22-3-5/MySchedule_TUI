@@ -10,7 +10,6 @@ use ratatui::prelude::*;
 
 pub struct ConferenceEditForm(Form);
 
-#[allow(dead_code)]
 impl ConferenceEditForm {
     pub fn new(conference: Conference) -> Self {
         let field_layout: Vec<Vec<(Box<dyn InputField>, u16)>> = vec![

@@ -17,7 +17,7 @@ impl InputField for StrInputField {
         }
     }
 }
-#[allow(dead_code)]
+
 impl StrInputField {
     pub fn new(title: Option<String>, max_length: usize, initial_text: Option<String>) -> Self {
         Self(BaseInputField::new(

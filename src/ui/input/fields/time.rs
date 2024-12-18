@@ -39,7 +39,7 @@ impl InputField for TimeInputField {
         self.is_cursor_visible = visible
     }
 }
-#[allow(dead_code)]
+
 impl TimeInputField {
     pub fn new(title: Option<String>, initial_time: Option<Time>) -> Self {
         Self {

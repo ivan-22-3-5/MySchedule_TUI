@@ -15,7 +15,6 @@ pub struct Form {
     active_field_style: Style,
 }
 
-#[allow(dead_code)]
 impl Form {
     pub fn new<O, I>(layout: O) -> Self
     where

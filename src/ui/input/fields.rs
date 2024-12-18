@@ -17,7 +17,7 @@ use ratatui::prelude::Style;
 use ratatui::widgets::{Block, Borders};
 
 type BorderStyle = (Borders, Style);
-#[allow(dead_code)]
+
 pub trait InputField: Component {
     fn get_value(&self) -> String;
     fn borders(&mut self, border_style: BorderStyle);
@@ -46,7 +46,6 @@ impl InputField for BaseInputField {
     }
 }
 
-#[allow(dead_code)]
 impl BaseInputField {
     pub fn new(title: Option<String>, input_handler: Box<dyn InputHandler>) -> Self {
         Self {
@@ -151,7 +150,6 @@ impl InputHandler for BaseInputHandler {
     }
 }
 
-#[allow(dead_code)]
 impl BaseInputHandler {
     pub fn new(initial: Option<String>, max_length: usize, validate: Option<ValidateFn>) -> Self {
         let initial_text: Vec<char> = initial

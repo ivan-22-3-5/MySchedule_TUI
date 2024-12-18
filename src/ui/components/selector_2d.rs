@@ -3,7 +3,7 @@ pub struct Selector2D {
     selected_row: usize,
     selected_col: usize,
 }
-#[allow(dead_code)]
+
 impl Selector2D {
     pub fn new(row_lengths: Vec<usize>) -> Self {
         Self {

@@ -9,7 +9,7 @@ use ratatui::layout::Rect;
 use ratatui::Frame;
 
 pub struct IntInputHandler(BaseInputHandler);
-#[allow(dead_code)]
+
 impl IntInputHandler {
     pub fn new(initial_number: Option<u32>, max: u32) -> Self {
         Self(BaseInputHandler::new(
