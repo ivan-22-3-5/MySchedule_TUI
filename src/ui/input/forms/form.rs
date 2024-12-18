@@ -107,7 +107,7 @@ impl Component for Form {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         if self.is_selected_field_active {
             match key.code {
-                KeyCode::Esc => {
+                KeyCode::Enter => {
                     self.is_selected_field_active = false;
                     let selected_field_style = self.selected_field_style;
                     self.selected_field()
