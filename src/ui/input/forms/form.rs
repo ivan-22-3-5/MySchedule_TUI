@@ -101,33 +101,30 @@ impl Form {
             })
             .collect()
     }
+
+    fn toggle_selected_field_activeness(&mut self) {
+        let is_active = !self.is_selected_field_active;
+
+        self.is_selected_field_active = is_active;
+        let new_style = if self.is_selected_field_active {
+            self.active_field_style
+        } else {
+            self.selected_field_style
+        };
+
+        self.selected_field().borders((Borders::ALL, new_style));
+        self.selected_field().set_cursor_visibility(is_active);
+    }
 }
 
 impl Component for Form {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
-        if self.is_selected_field_active {
-            match key.code {
-                KeyCode::Enter => {
-                    self.is_selected_field_active = false;
-                    let selected_field_style = self.selected_field_style;
-                    self.selected_field()
-                        .borders((Borders::ALL, selected_field_style));
-                    self.selected_field().set_cursor_visibility(false);
-                }
-                _ => {
+        match key.code {
+            KeyCode::Enter => self.toggle_selected_field_activeness(),
+            _ => {
+                if self.is_selected_field_active {
                     self.propagate_key(key)?;
-                }
-            }
-        } else {
-            match key.code {
-                KeyCode::Enter => {
-                    self.is_selected_field_active = true;
-                    let active_field_style = self.active_field_style;
-                    self.selected_field()
-                        .borders((Borders::ALL, active_field_style));
-                    self.selected_field().set_cursor_visibility(true);
-                }
-                _ => {
+                } else {
                     self.handle_field_selection(key);
                 }
             }
