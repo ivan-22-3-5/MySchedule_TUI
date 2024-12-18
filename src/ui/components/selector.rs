@@ -1,10 +1,10 @@
 pub struct Selector {
-    length: u64,
-    pub index: u64,
+    length: usize,
+    pub index: usize,
 }
 
 impl Selector {
-    pub fn new(length: u64) -> Self {
+    pub fn new(length: usize) -> Self {
         Self { length, index: 0 }
     }
     pub fn prev(&mut self) {
