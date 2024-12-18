@@ -1,7 +1,7 @@
 use crate::action::Action;
 use crate::models::Conference;
 use crate::theme::THEME;
-use crate::ui::input::fields::{InputField, StrInputField, TimeInputField};
+use crate::ui::input::fields::{CarouselInputField, InputField, StrInputField, TimeInputField};
 use crate::ui::input::forms::Form;
 use crate::ui::Component;
 use crossterm::event::KeyEvent;
@@ -50,6 +50,13 @@ impl ConferenceEditForm {
                     Some("Password".into()),
                     50,
                     Some(conference.password.unwrap_or_default()),
+                )),
+                50,
+            )],
+            vec![(
+                Box::new(CarouselInputField::new(
+                    Some("Autostart".into()),
+                    vec!["Allow".to_string(), "Deny".to_string()],
                 )),
                 50,
             )],

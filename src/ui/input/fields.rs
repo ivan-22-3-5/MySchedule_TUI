@@ -1,3 +1,4 @@
+mod carousel;
 mod int;
 mod string;
 mod time;
@@ -9,6 +10,7 @@ use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::text::Line;
 use ratatui::Frame;
 
+pub use carousel::CarouselInputField;
 pub use string::StrInputField;
 pub use time::TimeInputField;
 
