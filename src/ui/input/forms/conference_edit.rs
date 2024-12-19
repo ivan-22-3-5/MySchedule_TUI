@@ -11,6 +11,8 @@ use ratatui::prelude::*;
 pub struct ConferenceEditForm(Form);
 
 impl ConferenceEditForm {
+    const AUTOSTART_PERMISSION_OPTIONS: [&'static str; 2] = ["Deny", "Allow"];
+
     pub fn new(conference: Conference) -> Self {
         let field_layout: Vec<Vec<(Box<dyn InputField>, u16)>> = vec![
             vec![(
@@ -56,7 +58,9 @@ impl ConferenceEditForm {
             vec![(
                 Box::new(CarouselInputField::new(
                     Some("Autostart".into()),
-                    vec!["Deny".to_string(), "Allow".to_string()],
+                    Self::AUTOSTART_PERMISSION_OPTIONS
+                        .map(|o| o.to_string())
+                        .to_vec(),
                     conference.autostart_permission as usize,
                 )),
                 50,
@@ -82,6 +86,7 @@ impl ConferenceEditForm {
                 .expect("TimeInputField should give valid time"),
             link: input[2][0].clone(),
             password: (!input[3][0].is_empty()).then_some(input[3][0].clone()),
+            autostart_permission: input[4][0] == Self::AUTOSTART_PERMISSION_OPTIONS[1],
             ..Default::default()
         }
     }
