@@ -2,6 +2,7 @@ use crate::action::Action;
 use crate::ui::components::Selector;
 use crate::ui::input::fields::{BorderStyle, InputField};
 use crate::ui::Component;
+use crate::utils;
 use color_eyre::Result;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Constraint, Layout, Rect};
@@ -37,12 +38,6 @@ impl Component for CarouselInputField {
         Ok(None)
     }
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
-        fn calc_padding(width: usize, text_len: usize) -> (usize, usize) {
-            let width = width - 2 - 2;
-            let total_padding = width - text_len;
-            (total_padding / 2, total_padding - total_padding / 2)
-        }
-
         let area = Layout::vertical([Constraint::Length(3)]).split(area)[0];
         let block = Block::default()
             .borders(self.border_style.0)
@@ -50,14 +45,14 @@ impl Component for CarouselInputField {
             .title(self.title.clone());
         frame.render_widget(block.clone(), area);
 
-        let (left_padding, right_padding) =
-            calc_padding(area.width as usize, self.options[self.selector.index].len());
         frame.render_widget(
             Line::from(format!(
-                "<{}{}{}>",
-                " ".repeat(left_padding),
-                self.options[self.selector.index].clone(),
-                " ".repeat(right_padding),
+                "<{}>",
+                utils::center_text(
+                    &self.options[self.selector.index],
+                    area.width as usize - 2 - 2,
+                    ' '
+                )
             )),
             block.inner(area),
         );

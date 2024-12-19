@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 pub fn center_text(text: &str, width: usize, pad_with: char) -> String {
     if text.len() > width {
         panic!("Text to be centered cannot be longer than the width.");
