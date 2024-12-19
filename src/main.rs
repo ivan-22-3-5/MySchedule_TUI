@@ -14,6 +14,7 @@ mod models;
 mod theme;
 mod tui;
 mod ui;
+mod utils;
 
 #[tokio::main]
 async fn main() -> Result<()> {
