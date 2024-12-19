@@ -56,7 +56,8 @@ impl ConferenceEditForm {
             vec![(
                 Box::new(CarouselInputField::new(
                     Some("Autostart".into()),
-                    vec!["Allow".to_string(), "Deny".to_string()],
+                    vec!["Deny".to_string(), "Allow".to_string()],
+                    conference.autostart_permission as usize,
                 )),
                 50,
             )],

@@ -18,7 +18,7 @@ pub struct SettingsPage {
 impl SettingsPage {
     pub fn new(settings: Rc<RefCell<Settings>>) -> Self {
         Self {
-            selector: Selector::new(3),
+            selector: Selector::new(3, 0),
             settings,
         }
     }

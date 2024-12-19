@@ -18,9 +18,9 @@ pub struct CarouselInputField {
 }
 
 impl CarouselInputField {
-    pub fn new(title: Option<String>, options: Vec<String>) -> Self {
+    pub fn new(title: Option<String>, options: Vec<String>, initial_option: usize) -> Self {
         Self {
-            selector: Selector::new(options.len()),
+            selector: Selector::new(options.len(), initial_option),
             title: title.unwrap_or_default(),
             options,
             border_style: (Borders::ALL, Style::default()),

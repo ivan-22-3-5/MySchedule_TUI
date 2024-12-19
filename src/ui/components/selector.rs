@@ -4,8 +4,14 @@ pub struct Selector {
 }
 
 impl Selector {
-    pub fn new(length: usize) -> Self {
-        Self { length, index: 0 }
+    pub fn new(length: usize, start_from: usize) -> Self {
+        if start_from >= length {
+            panic!("Start index cannot be greater than length.");
+        }
+        Self {
+            length,
+            index: start_from,
+        }
     }
     pub fn prev(&mut self) {
         if self.length > 1 {
