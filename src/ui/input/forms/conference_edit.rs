@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::models::Conference;
+use crate::models::{Conference, Week};
 use crate::theme::THEME;
 use crate::ui::input::fields::{CarouselInputField, InputField, StrInputField, TimeInputField};
 use crate::ui::input::forms::Form;
@@ -7,6 +7,7 @@ use crate::ui::Component;
 use crossterm::event::KeyEvent;
 use delegate::delegate;
 use ratatui::prelude::*;
+use std::str::FromStr;
 
 pub struct ConferenceEditForm(Form);
 
@@ -65,6 +66,17 @@ impl ConferenceEditForm {
                 )),
                 50,
             )],
+            vec![(
+                Box::new(CarouselInputField::new(
+                    Some("Week".into()),
+                    Week::variants().map(|o| o.to_string()).to_vec(),
+                    Week::variants()
+                        .into_iter()
+                        .position(|w| w == conference.week.as_str())
+                        .expect("conference.week should be in variants"),
+                )),
+                50,
+            )],
         ];
         Self(
             Form::new(field_layout)
@@ -87,7 +99,8 @@ impl ConferenceEditForm {
             link: input[2][0].clone(),
             password: (!input[3][0].is_empty()).then_some(input[3][0].clone()),
             autostart_permission: input[4][0] == Self::AUTOSTART_PERMISSION_OPTIONS[1],
-            ..Default::default()
+            week: Week::from_str(&input[5][0])
+                .expect("Week input field should always give a valid week"),
         }
     }
 }
