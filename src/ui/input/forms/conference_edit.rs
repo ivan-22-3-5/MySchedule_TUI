@@ -14,7 +14,8 @@ pub struct ConferenceEditForm(Form);
 impl ConferenceEditForm {
     const AUTOSTART_PERMISSION_OPTIONS: [&'static str; 2] = ["Deny", "Allow"];
 
-    pub fn new(conference: Conference) -> Self {
+    pub fn new(conference: Option<Conference>) -> Self {
+        let conference = conference.unwrap_or_default();
         let field_layout: Vec<Vec<(Box<dyn InputField>, u16)>> = vec![
             vec![(
                 Box::new(StrInputField::new(

@@ -17,6 +17,7 @@ enum Mode {
     #[default]
     View,
     Edit(ConferenceEditForm),
+    Add(ConferenceEditForm),
 }
 
 pub struct SchedulePage {
@@ -65,8 +66,11 @@ impl SchedulePage {
         if key.code == KeyCode::Char('e') {
             let (day, conf) = self.selector.selected();
             self.mode = Mode::Edit(ConferenceEditForm::new(
-                self.schedule.borrow()[day][conf].clone(),
+                self.schedule.borrow()[day][conf].clone().into(),
             ));
+            return Ok(Some(Action::ChangeMode(AppMode::Edit)));
+        } else if key.code == KeyCode::Char('+') {
+            self.mode = Mode::Add(ConferenceEditForm::new(None));
             return Ok(Some(Action::ChangeMode(AppMode::Edit)));
         } else {
             match key.code {
@@ -94,6 +98,15 @@ impl Component for SchedulePage {
                 }
                 _ => Ok(form.handle_key_event(key)?),
             },
+            Mode::Add(form) => match key.code {
+                KeyCode::Esc => {
+                    let (day, _) = self.selector.selected();
+                    self.schedule.borrow_mut()[day].push(form.get_conference());
+                    self.mode = Mode::View;
+                    Ok(Some(Action::ChangeMode(AppMode::Schedule)))
+                }
+                _ => Ok(form.handle_key_event(key)?),
+            },
         }
     }
 
@@ -106,6 +119,7 @@ impl Component for SchedulePage {
                 self.render_conferences(frame, layout[1]);
             }
             Mode::Edit(form) => form.draw(frame, area)?,
+            Mode::Add(form) => form.draw(frame, area)?,
         }
         Ok(())
     }
