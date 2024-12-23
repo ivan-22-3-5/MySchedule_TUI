@@ -103,6 +103,9 @@ impl Component for SchedulePage {
                     let (day, _) = self.selector.selected();
                     self.schedule.borrow_mut()[day].push(form.get_conference());
                     self.mode = Mode::View;
+                    self.selector = Selector2D::new(
+                        self.schedule.borrow().iter().map(|day| day.len()).collect(),
+                    );
                     Ok(Some(Action::ChangeMode(AppMode::Schedule)))
                 }
                 _ => Ok(form.handle_key_event(key)?),
