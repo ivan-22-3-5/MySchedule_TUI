@@ -2,6 +2,6 @@
 
 ---
 
-MySchedule_TUI is a terminal user interface rust implementation of MySchedule.
+MySchedule_TUI is a terminal user interface implementation of MySchedule written in rust.
 
 ---
