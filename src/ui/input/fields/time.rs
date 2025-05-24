@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::models::Time;
+use crate::entities::Time;
 use crate::theme::THEME;
 use crate::ui::input::fields::int::IntInputHandler;
 use crate::ui::input::fields::{BorderStyle, InputField, InputHandler};

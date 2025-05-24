@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::models::Settings;
+use crate::entities::Settings;
 use crate::theme::THEME;
 use crate::ui::components::Selector;
 use crate::ui::Component;

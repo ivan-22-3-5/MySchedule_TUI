@@ -1,4 +1,4 @@
-use crate::models::Settings;
+use crate::entities::Settings;
 
 pub trait SettingsLoader {
     fn load(&mut self) -> Settings;

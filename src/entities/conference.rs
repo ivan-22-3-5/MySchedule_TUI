@@ -1,4 +1,4 @@
-use crate::models::Time;
+use super::Time;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
@@ -48,11 +48,4 @@ pub struct Conference {
     pub password: Option<String>,
     pub autostart_permission: bool,
     pub week: Week,
-}
-
-#[allow(dead_code)]
-impl Conference {
-    pub fn open(&self) {
-        webbrowser::open(&self.link).expect("Browser failed to open");
-    }
 }

@@ -6,7 +6,7 @@ use std::rc::Rc;
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::action::Mode;
-use crate::models::{Schedule, Settings};
+use crate::entities::{Schedule, Settings};
 use crate::ui::components::FpsCounter;
 use crate::ui::pages::{SchedulePage, SettingsPage};
 use crate::ui::Component;

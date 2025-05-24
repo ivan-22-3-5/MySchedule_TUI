@@ -1,5 +1,5 @@
 use crate::action::Action;
-use crate::models::{Conference, Week};
+use crate::entities::{Conference, Week};
 use crate::theme::THEME;
 use crate::ui::input::fields::{CarouselInputField, InputField, StrInputField, TimeInputField};
 use crate::ui::input::forms::Form;

@@ -2,7 +2,9 @@ use crate::action::Mode;
 use crate::{
     action::Action,
     config::Config,
-    models::{Schedule, Settings},
+    entities::{Schedule, Settings},
+    persistence::schedule::ScheduleLoader,
+    persistence::settings::SettingsLoader,
     tui::{Event, Tui},
     ui::{Component, Home},
 };
@@ -15,6 +17,8 @@ use tokio::sync::mpsc;
 use tracing::{debug, info};
 
 pub struct App {
+    schedule_loader: Box<dyn ScheduleLoader>,
+    settings_loader: Box<dyn SettingsLoader>,
     schedule: Rc<RefCell<Schedule>>,
     settings: Rc<RefCell<Settings>>,
     config: Config,
@@ -30,21 +34,19 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(tick_rate: f64, frame_rate: f64) -> Result<Self> {
+    pub fn new(
+        tick_rate: f64,
+        frame_rate: f64,
+        mut schedule_loader: Box<dyn ScheduleLoader>,
+        mut settings_loader: Box<dyn SettingsLoader>,
+    ) -> Result<Self> {
         let (action_tx, action_rx) = mpsc::unbounded_channel();
-        let schedule: Rc<RefCell<Schedule>> = Rc::new(RefCell::new(
-            match std::fs::File::open("files/schedule.json") {
-                Ok(file) => serde_json::from_reader(file)?,
-                Err(_) => Schedule::default(),
-            },
-        ));
-        let settings: Rc<RefCell<Settings>> = Rc::new(RefCell::new(
-            match std::fs::File::open("files/settings.json") {
-                Ok(file) => serde_json::from_reader(file)?,
-                Err(_) => Settings::default(),
-            },
-        ));
+        let schedule: Rc<RefCell<Schedule>> =
+            Rc::new(RefCell::new(schedule_loader.load("schedule")));
+        let settings: Rc<RefCell<Settings>> = 
+            Rc::new(RefCell::new(settings_loader.load()));
         Ok(Self {
+            schedule_loader,
             tick_rate,
             frame_rate,
             schedule: Rc::clone(&schedule),
@@ -60,6 +62,7 @@ impl App {
             last_tick_key_events: Vec::new(),
             action_tx,
             action_rx,
+            settings_loader,
         })
     }
 

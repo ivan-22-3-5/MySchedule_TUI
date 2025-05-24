@@ -1,5 +1,5 @@
 use crate::action::{Action, Mode as AppMode};
-use crate::models::Schedule;
+use crate::entities::Schedule;
 use crate::theme::THEME;
 use crate::ui::components::Selector2D;
 use crate::ui::input::forms::ConferenceEditForm;
@@ -28,7 +28,7 @@ pub struct SchedulePage {
 
 impl SchedulePage {
     pub fn new(schedule: Rc<RefCell<Schedule>>) -> Self {
-        let day_lengths = schedule.borrow().iter().map(|day| day.len()).collect();
+        let day_lengths = schedule.borrow().get_conference_count_by_day();
         Self {
             selector: Selector2D::new(day_lengths),
             schedule,
@@ -52,7 +52,10 @@ impl SchedulePage {
 
     fn render_conferences(&mut self, frame: &mut Frame, area: Rect) {
         let (selected_day, selected_conference) = self.selector.selected();
-        let titles: Vec<String> = self.schedule.borrow()[selected_day]
+        let titles: Vec<String> = self
+            .schedule
+            .borrow()
+            .get_day(selected_day)
             .iter()
             .map(|c| c.title.clone())
             .collect();
@@ -65,8 +68,9 @@ impl SchedulePage {
     fn handle_view_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<Option<Action>> {
         if key.code == KeyCode::Char('e') {
             let (day, conf) = self.selector.selected();
+            // TODO: shouldn't be allowed to edit a conference that doesn't exist
             self.mode = Mode::Edit(ConferenceEditForm::new(
-                self.schedule.borrow()[day][conf].clone().into(),
+                self.schedule.borrow().get_day(day)[conf].clone().into(),
             ));
             return Ok(Some(Action::ChangeMode(AppMode::Edit)));
         } else if key.code == KeyCode::Char('+') {
@@ -92,7 +96,10 @@ impl Component for SchedulePage {
             Mode::Edit(form) => match key.code {
                 KeyCode::Esc => {
                     let (day, conf) = self.selector.selected();
-                    self.schedule.borrow_mut()[day][conf] = form.get_conference();
+                    self.schedule
+                        .borrow_mut()
+                        .update_conference(day, conf, form.get_conference())
+                        .expect("Failed to update conference, conference not found");
                     self.mode = Mode::View;
                     Ok(Some(Action::ChangeMode(AppMode::Schedule)))
                 }
@@ -101,11 +108,12 @@ impl Component for SchedulePage {
             Mode::Add(form) => match key.code {
                 KeyCode::Esc => {
                     let (day, _) = self.selector.selected();
-                    self.schedule.borrow_mut()[day].push(form.get_conference());
+                    self.schedule
+                        .borrow_mut()
+                        .add_conference(day, form.get_conference());
                     self.mode = Mode::View;
-                    self.selector = Selector2D::new(
-                        self.schedule.borrow().iter().map(|day| day.len()).collect(),
-                    );
+                    self.selector =
+                        Selector2D::new(self.schedule.borrow().get_conference_count_by_day());
                     Ok(Some(Action::ChangeMode(AppMode::Schedule)))
                 }
                 _ => Ok(form.handle_key_event(key)?),

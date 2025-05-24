@@ -1,4 +1,4 @@
-use crate::models::Schedule;
+use crate::entities::Schedule;
 
 pub trait ScheduleLoader {
     fn save(&mut self, schedule: Schedule);

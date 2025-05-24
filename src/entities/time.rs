@@ -2,7 +2,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Time(u8, u8);
 
 impl Time {
